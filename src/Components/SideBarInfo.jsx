@@ -11,28 +11,19 @@ function SideBarInfo() {
     console.log(pagina);
     if (pagina.pathname == '/Chats')
         return (
-            <div className='SideBarInfo w-full h-full bg-comp-1 px-4 flex flex-col justify-between'>
-                <ul className="overflow-y-auto h-full">
-                    <li id="Active" value="Group" className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3  w-full justify-between flex flex-row">
+            <div className='SideBarInfo px-4 bg-comp-1 flex flex-col justify-between'>
+                <ul className="overflow-y-auto flex flex-col min-h-[96]">
+                    <li id="Active" value="Group" className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
                         <div className="flex flex-row w-full">
-                            <img src={GroupImg} className="ImgGroup w-1/5 rounded-full mx-2" />
+                            <img src={GroupImg} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
                             <div className="w-full justify-center flex flex-col">
-                                <h1 id="GroupName" className="text-3xl text-color font-bold flex justify-between"> GRUPO 1 <span className="text-sm font-bold text-background">9:54 AM</span></h1>
-                                <p id="LastMessageSent" className="text-sm text-color">Ultimo Mensaje Enviado</p>
-                            </div>
-                        </div>
-                    </li>
-                    <li id="Active" value="Chat" className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3  w-full justify-between flex flex-row">
-                        <div className="flex flex-row w-full">
-                            <img src={GroupImg} className="ImgGroup w-1/5 rounded-full mx-2" />
-                            <div className="w-full justify-center flex flex-col">
-                                <h1 id="GroupName" className="text-3xl text-color font-bold flex justify-between"> Palonter <span className="text-sm font-bold text-background">9:54 AM</span></h1>
-                                <p id="LastMessageSent" className="text-sm text-color">Ultimo Mensaje Enviado</p>
+                                <h1 id="GroupName" className="text-xl xs:text-3xl text-color font-bold flex justify-between"> GRUPO 1 <span className="text-xs xs:text-sm font-bold text-background">9:54 AM</span></h1>
+                                <p id="LastMessageSent" className="text-xs xs:text-sm text-color">Ultimo Mensaje Enviado</p>
                             </div>
                         </div>
                     </li>
                 </ul>
-                <button id="AddChat" className="w-full rounded-xl font-bold my-4 py-1"><AddIcon /> Nuevo Chat </button>
+                <button id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
             </div>
 
         );

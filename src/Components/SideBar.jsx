@@ -12,12 +12,26 @@ function SideBar() {
     const location = useLocation();
     const locationpaths = "/ModifyUser";
     const locationpaths2 = "/VideoChat";
-    var SideBarWidth = location.pathname === locationpaths ? 'w-1/2' : 'w-1/3';
-    SideBarWidth = location.pathname === locationpaths2 ? '' : 'w-1/3';
+    var SideBarWidth;
+
+    if(location.pathname === locationpaths2)
+    {
+        SideBarWidth = '';
+    }
+    else{
+        if(location.pathname === locationpaths)
+        {
+            SideBarWidth = 'w-1/2';
+        }
+        else{
+            SideBarWidth= 'w-1/4 md:w-1/3';
+        }
+    }
+
     return (
         <div className={"SideBar flex " + SideBarWidth}>
-            <div className='SideBarList'>
-                <div className="row-User text-primary flex items-center w-full justify-center my-8">
+            <div className='SideBarList w-6 xs:w-16 mx-4 flex flex-col items-center'>
+                <div className="row-User text-primary flex items-center justify-center my-8">
                     <Dropdown placement="bottomEnd" animation="fade" trigger="hover" icon={<PersonIcon style={{ fontSize: "32px" }} />}>
                         <div id="User-DropDown" className="font-bold text-comp-1 rounded-xl p-2 flex justify-center flex-col space-y-2 bg-primary">
                             <Dropdown.Item>
@@ -33,7 +47,7 @@ function SideBar() {
                         </div>
                     </Dropdown>
                 </div>
-                <ul className="SideBarItems">
+                <ul className="SideBarItems space-y-6">
                     {SideBarData.map((val, key) => {
                         return (
                             <li

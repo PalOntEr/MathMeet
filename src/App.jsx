@@ -25,7 +25,7 @@ function Main()
 
   const NoSideBar = ["/", "/Register"];
 
-  return( <div className='App'>
+  return( <div className='App w-screen h-screen'>
     <div className="flex w-full h-full">
     {!NoSideBar.includes(location.pathname) && <SideBar />}
       <Switch>
@@ -39,6 +39,7 @@ function Main()
         <Route path="/VideoChat" exact component={VideoChat}/>
       </Switch>
       </div>
-  </div>);
+  </div>
+);
 }
 export default App;
