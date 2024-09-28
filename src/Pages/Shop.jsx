@@ -9,9 +9,9 @@ import './Shop.css'
 
 function Shop() {
     return (
-            <div className="container px-4 w-3/4 xs:w-2/3 h-full flex flex-col justify-evenly">
-                <h1 className="text-7xl font-bold text-primary text-center mt-4">MEET <span className="text-secondary">SHOP</span></h1>
-                <div id="EmojisContainer" className="w-full  mt-2">
+            <div className="container px-4 w-3/4 xs:w-2/3 flex flex-col justify-between">
+                <h1 className="text-7xl font-bold text-primary text-center">MEET <span className="text-secondary">SHOP</span></h1>
+                <div id="EmojisContainer" className="w-full">
                 <h2 className="text-2xl font-semibold text-primary">EMOJIS</h2>
                 <div className="h-1 bg-comp-1 my-1"></div>
                 <div id="EmojisContainer" className="w-full bg-comp-1 flex overflow-x-auto whitespace-nowrap rounded-xl p-8 justify-between mt-2">
@@ -36,7 +36,7 @@ function Shop() {
                     
                 </div>
                 </div>
-                <div className="flex space-x-4 h-1/3">
+                <div className="flex space-x-4">
                     <div id="TitlesContainer" className="w-2/3 flex flex-col justify-between">
                     <div>
                     <h2 className="text-2xl font-semibold text-primary mt-4">TITLES</h2>

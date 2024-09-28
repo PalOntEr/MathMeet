@@ -58,7 +58,7 @@ function Chats() {
 
                 <div id="Tasks-Container">
                     <h3 className="text-md xs:text-xl font-bold text-primary">Tarea(s):</h3>
-                    <div className='TasksList h-96 md:h-80 flex-grow overflow-hidden'>
+                    <div className='TasksList h-96 md:h-48 flex-grow overflow-hidden'>
                         <ul className="overflow-y-auto max-h-[300px]">
                             <li className="flex items-center py-2 border-b-2 border-[var(--primary-color)]">
                                 <div className="Icon-container text-background"><AssignmentIcon style={{ fontSize: "32px" }} /></div>
