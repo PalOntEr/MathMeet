@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 function ReviewAssignments()
 {
     return(
-        <div id="Review-Container" className="w-2/3 h-full justify-center items-center flex">
+        <div id="Review-Container" className="w-3/4 h-full justify-center items-center flex">
             <div id="Assignments-Container" className="flex bg-comp-1 w-5/6 h-5/6 p-4 rounded-xl">
                 <ul className="w-full overflow-y-auto h-full">
                         <Link to="/Assignments">
