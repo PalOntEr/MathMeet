@@ -10,6 +10,7 @@ import ModifyUser from './Pages/ModifyUser.jsx';
 import SideBar from './Components/SideBar.jsx';
 import {BrowserRouter as Router,Switch,Route } from 'react-router-dom';  
 import { useLocation } from 'react-router-dom/cjs/react-router-dom.min.js';
+import ReviewAssignments from './Pages/ReviewAssignments.jsx';
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function Main()
 
   const NoSideBar = ["/", "/Register"];
 
-  return( <div className='App'>
+  return( <div className='App w-screen h-screen'>
     <div className="flex w-full h-full">
     {!NoSideBar.includes(location.pathname) && <SideBar />}
       <Switch>
@@ -37,8 +38,10 @@ function Main()
         <Route path="/Assignments" exact component={Assignments}/>
         <Route path="/Test" exact component={Test}/>
         <Route path="/VideoChat" exact component={VideoChat}/>
+        <Route path="/ReviewAssignments" exact component={ReviewAssignments}/>
       </Switch>
       </div>
-  </div>);
+  </div>
+);
 }
 export default App;

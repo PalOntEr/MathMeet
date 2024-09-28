@@ -4,13 +4,13 @@ import './Assignments.css';
 
 function Assignments() {
     return (
-            <div className='Content-container flex flex-col justify-between w-full m-6'>
+            <div className='Content-container flex flex-col justify-between w-3/4 mx-2'>
                 <div className="flex flex-col text-5xl w-full">
                     <h2 className="text-3xl text-primary text-center font-bold">Group Name</h2>
                     <h1 className="text-5xl text-secondary text-center font-bold">Assignment Name</h1>
                     <div id="Description-Container" className=" space-y-2 my-8">
                         <h2 className="text-2xl font-bold text-color">Description:</h2>
-                        <div className="w-full min-h-96 bg-comp-1 p-4 rounded-xl">
+                        <div className="w-full min-h-80 bg-comp-1 p-4 rounded-xl">
                             <p className="text-lg text-white">HOLAAAAAAAACOMO ESTAN TODOOOOOS JEEJEJEJEJ</p>
                         </div>
                     </div>

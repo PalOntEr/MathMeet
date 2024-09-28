@@ -1,20 +1,4 @@
-.SideBarList{
-    background-color: #0c0d21;
-    min-width: 100px;
-    height:100vh;
-}
 
-.SideBarList .row{
-    margin:25px auto;
-    list-style-type: none;
-}
-
-.SideBarInfo
-{
-    max-height: 100%;
-    scrollbar-color:#736ea4 transparent;
-    scrollbar-width:thin;
-}
 .SideBarItems .Icon-User
 {
     color:#1e2142;
@@ -29,14 +13,6 @@
     transition: 250ms;
     margin: auto;
 }
-
-.SideBarItems
-{
-    padding:0px;
-    display: grid;
-    place-items: center;
-}
-
 .SideBarItems .Icon:hover{
     border-radius: 15px;
     transform: scale(1.5);

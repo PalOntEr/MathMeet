@@ -9,30 +9,34 @@ import './Shop.css'
 
 function Shop() {
     return (
-            <div className="container px-4 ">
-                <h1 className="text-7xl font-bold text-primary text-center mt-4 mb-12">MEET <span className="text-secondary">SHOP</span></h1>
+            <div className="container px-4 w-3/4 xs:w-2/3 flex flex-col justify-between">
+                <h1 className="text-7xl font-bold text-primary text-center">MEET <span className="text-secondary">SHOP</span></h1>
+                <div id="EmojisContainer" className="w-full">
                 <h2 className="text-2xl font-semibold text-primary">EMOJIS</h2>
                 <div className="h-1 bg-comp-1 my-1"></div>
                 <div id="EmojisContainer" className="w-full bg-comp-1 flex overflow-x-auto whitespace-nowrap rounded-xl p-8 justify-between mt-2">
-                    <div className="Emoji w-1/6 min-w-[16%] h-1/6 text-color">
+
+                    <div className="Emoji text-color w-1/6 min-w-[16%]">
                         <img src={Emote1} alt="CalcEmote1" className="w-auto h-auto" />
-                        <h3 className="text-center font-bold text-xl">150 CalCoins</h3>
+                        <h3 className="text-center font-bold text-sm xs:text-xl">150 CalCoins</h3>
                     </div>
                     
-                    <div className="Emoji w-1/6 min-w-[16%] h-1/6 text-color">
+                    <div className="Emoji text-color w-1/6 min-w-[16%]">
                         <img src={Emote2} alt="CalcEmote1" className="w-auto h-auto" />
-                        <h3 className="text-center font-bold text-xl">150 CalCoins</h3>
+                        <h3 className="text-center font-bold text-sm xs:text-xl">150 CalCoins</h3>
                     </div>
-                    <div className="Emoji w-1/6 min-w-[16%] h-1/6 text-color">
-                        <img src={Emote3} alt="CalcEmote1" className="w-auto h-auto" />
-                        <h3 className="text-center font-bold text-xl">150 CalCoins</h3>
+                    <div className="Emoji text-color w-1/6 min-w-[16%]">
+                        <img src={Emote3} alt="CalcEmote1" className="" />
+                        <h3 className="text-center font-bold text-sm xs:text-xl">150 CalCoins</h3>
                     </div>
-                    <div className="Emoji w-1/6 min-w-[16%] h-1/6 text-color">
+                    <div className="Emoji text-color w-1/6 min-w-[16%]">
                         <img src={Emote4} alt="CalcEmote1" className="w-auto h-auto" />
-                        <h3 className="text-center font-bold text-xl">150 CalCoins</h3>
+                        <h3 className="text-center font-bold text-sm xs:text-xl">150 CalCoins</h3>
                     </div>
+                    
                 </div>
-                <div className="flex space-x-4 h-auto">
+                </div>
+                <div className="flex space-x-4">
                     <div id="TitlesContainer" className="w-2/3 flex flex-col justify-between">
                     <div>
                     <h2 className="text-2xl font-semibold text-primary mt-4">TITLES</h2>
@@ -60,11 +64,11 @@ function Shop() {
                         </div>
                         <p className="text-secondary text-2xl font-semibold">CalCoins: 1500</p>
                     </div>
-                    <div id="AvatarContainer" className="w-1/3 h-full">
+                    <div id="AvatarContainer" className="w-1/3 flex flex-col">
                     <h2 className="text-2xl font-semibold text-primary mt-4">AVATAR OF THE DAY</h2>
-                    <div className="h-1 bg-comp-1 my-1 w-full "></div>
-                        <div className="w-full h-full bg-comp-1 rounded-xl p-6 justify-center flex">
-                            <div className='flex flex-col Emoji text-color w-3/4 h-3/4'>
+                        <div className="h-1 bg-comp-1 my-1 w-full"></div>
+                        <div className="bg-comp-1 rounded-xl p-6 w-full h-auto flex justify-center">
+                            <div className='flex flex-col Emoji text-color w-1/2 h-auto items-center'>
                             <img src={Emote5} className="w-auto h-auto"/>
                             <h3 className="text-center font-bold text-xl">150 CalCoins</h3>
                             </div>
