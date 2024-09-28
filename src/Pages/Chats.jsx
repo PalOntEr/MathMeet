@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom'
 function Chats() {
 
     return (
-        <div id="Content-container" className="flex h-screen w-4/5 xs:w-2/3">
+        <div id="Content-container" className="flex h-screen w-2/3 xs:w-3/4">
             <div id="Chat-Container" className="flex flex-col justify-between h-full w-3/4 px-2">
                 <div className="h-[10%]">
                     <Link to="/VideoChat">
@@ -58,16 +58,15 @@ function Chats() {
 
                 <div id="Tasks-Container">
                     <h3 className="text-md xs:text-xl font-bold text-primary">Tarea(s):</h3>
-                    <div className='TasksList flex-grow overflow-hidden'>
+                    <div className='TasksList h-96 md:h-80 flex-grow overflow-hidden'>
                         <ul className="overflow-y-auto max-h-[300px]">
                             <li className="flex items-center py-2 border-b-2 border-[var(--primary-color)]">
-                                <div className="Icon-container text-background"><AssignmentIcon style={{ fontSize: "16px" }} /></div>
+                                <div className="Icon-container text-background"><AssignmentIcon style={{ fontSize: "32px" }} /></div>
                                 <div className="TaskInfo-container">
                                     <h4 className="text-md xs:text-lg font-bold text-primary">Nombre De Tarea</h4>
                                     <p className="text-xs    text-primary">Vencimiento: 25/04/2022</p>
                                 </div>
                             </li>
-                            
                         </ul>
                     </div>
                 </div>
