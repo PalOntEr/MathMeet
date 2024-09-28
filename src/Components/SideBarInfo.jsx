@@ -11,7 +11,7 @@ function SideBarInfo() {
     console.log(pagina);
     if (pagina.pathname == '/Chats')
         return (
-            <div className='SideBarInfo px-4 bg-comp-1 flex flex-col justify-between'>
+            <div className='SideBarInfo px-4 bg-comp-1 flex flex-col justify-between w-full'>
                 <ul className="overflow-y-auto flex flex-col min-h-[96]">
                     <li id="Active" value="Group" className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
                         <div className="flex flex-row w-full">
@@ -30,7 +30,7 @@ function SideBarInfo() {
 
     if (pagina.pathname === '/Shop')
         return (
-            <div className='SideBarInfo h-full bg-comp-1 px-4 w-full'>
+            <div className='SideBarInfo h-full px-4 bg-comp-1 flex flex-col justify-between w-full'>
                 <ul className="overflow-y-auto h-[98%]">
                     <li id="RewardContainer" className="border-b-2 border-[var(--primary-color)] py-3 flex">
                         <div className="text-background flex self-center"><WorkspacePremiumIcon style={{ fontSize: "50px" }} /></div>
@@ -43,9 +43,9 @@ function SideBarInfo() {
             </div>
         );
 
-    if (pagina.pathname === '/Assignments')
+    if (pagina.pathname === '/Assignments' || pagina.pathname === '/ReviewAssignments')
         return (
-            <div className='SideBarInfo h-full bg-comp-1 px-4 w-full'>
+            <div className='SideBarInfo h-full px-4 bg-comp-1 flex flex-col justify-between w-full'>
                 <ul className="overflow-y-auto h-[98%]">
                     <li id="TaskContainer" class="border-b-2 border-[var(--primary-color)] py-4 flex">
                         <div className='text-background'><AssignmentIcon style={{ fontSize: "50px" }} /></div>
