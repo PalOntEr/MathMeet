@@ -1,0 +1,23 @@
+{
+  "Version": 1,
+  "Hash": "j5nCevS0pUpitENWcbi/OYONm7Jas6THEdJESy580QM=",
+  "Source": "POI_2024.Server",
+  "BasePath": "_content/POI_2024.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Users\\maxan\\Documents\\FCFM\\LMAD\\Séptimo semestre\\Clases\\Programación orientada a internet\\Repository\\POI_2024\\poi_2024.client\\poi_2024.client.esproj",
+      "Version": 2,
+      "Source": "poi_2024.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
+    }
+  ],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
