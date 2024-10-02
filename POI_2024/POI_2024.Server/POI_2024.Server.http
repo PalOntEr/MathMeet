@@ -1,0 +1,6 @@
+@POI_2024.Server_HostAddress = http://localhost:5184
+
+GET {{POI_2024.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

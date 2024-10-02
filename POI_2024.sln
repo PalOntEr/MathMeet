@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "POI_2024.Server", "POI_2024\POI_2024.Server\POI_2024.Server.csproj", "{49598FA2-CF1D-4EF5-93FF-E73ED2FDEFA1}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "poi_2024.client", "POI_2024\poi_2024.client\poi_2024.client.esproj", "{6570099F-2D20-4356-BDA8-074FA668ADA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49598FA2-CF1D-4EF5-93FF-E73ED2FDEFA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49598FA2-CF1D-4EF5-93FF-E73ED2FDEFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49598FA2-CF1D-4EF5-93FF-E73ED2FDEFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49598FA2-CF1D-4EF5-93FF-E73ED2FDEFA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6570099F-2D20-4356-BDA8-074FA668ADA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6570099F-2D20-4356-BDA8-074FA668ADA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6570099F-2D20-4356-BDA8-074FA668ADA2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6570099F-2D20-4356-BDA8-074FA668ADA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6570099F-2D20-4356-BDA8-074FA668ADA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6570099F-2D20-4356-BDA8-074FA668ADA2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD612CA9-A5DB-4CF3-9C4A-C79DF06B82E2}
+	EndGlobalSection
+EndGlobal
