@@ -1,4 +1,4 @@
-namespace POI_2024.Server
+namespace POI_2024.Server.Models
 {
     public class WeatherForecast
     {

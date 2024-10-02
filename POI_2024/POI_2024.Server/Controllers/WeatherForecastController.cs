@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using POI_2024.Server.Models;
 
 namespace POI_2024.Server.Controllers
 {

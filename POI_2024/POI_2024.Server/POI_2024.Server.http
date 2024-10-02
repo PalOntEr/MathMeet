@@ -4,3 +4,8 @@ GET {{POI_2024.Server_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{POI_2024.Server_HostAddress}}/usuarios/
+Accept: application/json
+
+###
