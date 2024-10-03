@@ -24,7 +24,7 @@ const Test = () => {
                             <span>{usuario.nombreCompleto}</span>
                             <span>{usuario.contrasena}</span>
                             <span>{usuario.iD_ArchivoFoto}</span>
-                            <span>{usuario.calcoins}</span>
+                            <span>{usuario.calCoins}</span>
                         </li>
                     ))}
                 </ul>

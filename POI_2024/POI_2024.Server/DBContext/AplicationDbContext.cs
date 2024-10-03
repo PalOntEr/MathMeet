@@ -10,7 +10,7 @@ namespace POI_2024.Server.DBContext
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Usuario>().HasKey(u => u.Matricula); // Add this line to define the primary key
+            modelBuilder.Entity<Usuario>().HasKey(u => u.Matricula);
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
