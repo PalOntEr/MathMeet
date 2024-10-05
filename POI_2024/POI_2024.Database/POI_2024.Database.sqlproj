@@ -33,9 +33,15 @@
     <None Include="Database\INITIALIZE DATABASE.sql" />
     <Build Include="Programmability\Stored Procedures\sp_Usuario.sql" />
     <PostDeploy Include="Scripts\PostDeploy\Script.DummyData.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Mensaje.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Archivos.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Premios.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="POI_2024.Database.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="POI_2024.Database.refactorlog" />
   </ItemGroup>
   <Target Name="BeforeBuild">
     <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
