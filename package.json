@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@microsoft/signalr": "^8.0.7",
+    "socket.io-client": "^4.8.0"
+  }
+}
