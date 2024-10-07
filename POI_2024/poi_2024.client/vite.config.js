@@ -51,10 +51,18 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/CreateUser': {
+                target,
+                secure: false
+            },
+            '^/LogIn': {
+                target,
+                secure: false
+            },
             '^/chatHub': {
                 target,
                 changeOrigin: true,
-                ws:true,
+                ws: true,
                 secure: false
             }
         },
