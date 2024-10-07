@@ -15,7 +15,7 @@ const Chat = () => {
     useEffect(() => {
        const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chatHub", {
-                withCredentials: true // If you are using cookies, enable this
+                withCredentials: true
             })
             .withAutomaticReconnect()
             .build();
