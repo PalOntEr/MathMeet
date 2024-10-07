@@ -1,16 +1,48 @@
 import './LogIn.css'
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const LogIn = () => {
 
   const [Matricula, setMatricula] = useState('');
   const [Contraseña, setContraseña] = useState('');
-  const History = useHistory();
-  const handleSubmit = () => {
-    History.push("/Home");
-  }
+
+  const [mostrarDiv, setMostrarDiv] = useState(false);
+    const handleSubmit = async (e) => {
+        e.preventDefault();  // Evita que la página se recargue al enviar el formulario
+
+
+        // Construir el objeto a enviar en la solicitud POST
+        const loogin = {           
+            matricula: Matricula,
+            contrasena: Contraseña,
+           
+        };
+
+        try {
+            // Realiza la solicitud POST a la API
+            const response = await fetch('https://localhost:7100/LogIn', {  //la path de la api (sin el controller)
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loogin),  // convierte el objeto a JSON (que es lo que espera la api)
+            });
+
+
+           
+            if (!response.ok) {
+                throw new Error('Error en el inicio de sesion'); //si la contrseña es incorrecta o no existe el usuario
+            }
+
+            window.location.href = "https://localhost:5173/Chats"; //si todo sale bien re redirecciona a la pagina de chats
+
+        } catch (error) {
+            //console.error('Error al registrar el usuario:', error);
+            //alert("Hubo un error al inicial sesion"); //dice que algo salio mal
+            setMostrarDiv(true);
+        }
+    }
 
   return (
       <div className="flex flex-col h-screen w-screen justify-center items-center ">
@@ -27,10 +59,19 @@ const LogIn = () => {
                 <p className="text-primary">Contraseña</p>
                 <input className="inputLine w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" value={Contraseña} onChange={(e) => setContraseña(e.target.value)} name="Contraseña" type="password" />
               </div>
-              <div className="btn my-2 justify-center flex">
-                <Link to="/Chats">
-                  <button className="btn-submit bg-primary text-comp-1 px-6 py-0.5" > Ingresar </button>
-                </Link>
+
+              {mostrarDiv && (
+                <div id="alert-border-2" className="flex items-center p-4 mb-4 text-red-800 border-t-4 border-red-300 bg-red-50 dark:text-red-400 dark:bg-gray-800 dark:border-red-800" role="alert">
+                    <svg className="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                    </svg>
+                    <div className="ms-3 text-sm font-medium">
+                       Usuario o contraseña incorrectos.
+                    </div>
+                </div>
+              )}
+              <div className="btn my-2 justify-center flex">               
+                  <button className="btn-submit bg-primary text-comp-1 px-6 py-0.5" > Ingresar </button>                
               </div>
             </form>
             <p className="Register text-center mt-4 text-primary">¿No tienes cuenta? <Link to="/Register"><span id="Registrarse" className="text-secondary underline">Registrate</span></Link></p>

@@ -8,4 +8,10 @@
         public int ID_ArchivoFoto { get; set; }
         public int CalCoins { get; set; }
     }
+
+    public class UserLoginRequest
+    {
+        public int Matricula { get; set; }
+        public string Contrasena { get; set; }
+    }
 }
