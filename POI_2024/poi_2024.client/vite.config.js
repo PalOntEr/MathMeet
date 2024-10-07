@@ -50,6 +50,12 @@ export default defineConfig({
             '^/usuarios': {
                 target,
                 secure: false
+            },
+            '^/chatHub': {
+                target,
+                changeOrigin: true,
+                ws:true,
+                secure: false
             }
         },
         port: 5173,
