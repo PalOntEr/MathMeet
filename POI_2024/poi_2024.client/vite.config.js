@@ -50,6 +50,14 @@ export default defineConfig({
             '^/usuarios': {
                 target,
                 secure: false
+            },
+            '^/CreateUser': {
+                target,
+                secure: false
+            },
+            '^/LogIn': {
+                target,
+                secure: false
             }
         },
         port: 5173,
