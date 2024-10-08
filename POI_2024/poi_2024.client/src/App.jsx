@@ -8,40 +8,39 @@ import Register from './Register.jsx';
 import Test from './Test.jsx';
 import ModifyUser from './Pages/ModifyUser.jsx';
 import SideBar from './Components/SideBar.jsx';
-import {BrowserRouter as Router,Switch,Route } from 'react-router-dom';  
-import { useLocation } from 'react-router-dom/cjs/react-router-dom.min.js';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import ReviewAssignments from './Pages/ReviewAssignments.jsx';
 
 function App() {
-  return (
-      <Router>
-        <Main />
-    </Router>
-  );
+    return (
+        <Router>
+            <Main />
+        </Router>
+    );
 }
 
-function Main()
-{
-  const location = useLocation();
+function Main() {
+    const location = useLocation();
 
-  const NoSideBar = ["/", "/Register"];
+    const NoSideBar = ["/", "/Register"];
 
-  return( <div className='App w-screen h-screen'>
-    <div className="flex w-full h-full">
-    {!NoSideBar.includes(location.pathname) && <SideBar />}
-      <Switch>
-        <Route path="/" exact component ={LogIn}/>
-        <Route path="/Register" exact component={Register}/>
-        <Route path="/ModifyUser" exact component ={ModifyUser}/>
-        <Route path="/Chats" exact component={Chats}/>
-        <Route path="/Shop" exact component={Shop}/>
-        <Route path="/Assignments" exact component={Assignments}/>
-        <Route path="/Test" exact component={Test}/>
-        <Route path="/VideoChat" exact component={VideoChat}/>
-        <Route path="/ReviewAssignments" exact component={ReviewAssignments}/>
-      </Switch>
-      </div>
-  </div>
-);
+    return (<div className='App w-screen h-screen'>
+        <div className="flex w-full h-full">
+            {!NoSideBar.includes(location.pathname) && <SideBar />}
+            <Routes>
+                <Route path="/" element={<LogIn />} />
+                <Route path="/Register" element={<Register />} />
+                <Route path="/ModifyUser" element={<ModifyUser />} />
+                <Route path="/Chats" element={<Chats />} />
+                <Route path="/Shop" element={<Shop />} />
+                <Route path="/Assignments" element={<Assignments />} />
+                <Route path="/Test" element={<Test />} />
+                <Route path="/VideoChat" element={<VideoChat />} />
+                <Route path="/ReviewAssignments" element={<ReviewAssignments />} />
+            </Routes>
+        </div>
+    </div>
+    );
 }
 export default App;

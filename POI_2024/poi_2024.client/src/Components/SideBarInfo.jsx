@@ -4,7 +4,7 @@ import GroupImg from '../Images/DAMN.png'
 import './SideBarInfo.css'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
+import { useLocation } from 'react-router-dom';
 
 import { Link } from 'react-router-dom'
 function SideBarInfo() {
