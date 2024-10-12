@@ -1,15 +1,62 @@
-import {useState} from 'react';
+import { useState, useEffect } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import GroupImg from '../Images/DAMN.png'
 import './SideBarInfo.css'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import RemoveIcon from '@mui/icons-material/Remove';
 
-import { Link } from 'react-router-dom'
+const Modal = ({ show, handleClose, children }) => {
+    if (!show) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-comp-1 w-1/2 p-6 space-y-4 rounded-lg shadow-lg">
+                <button onClick={handleClose} className="mb-4 text-red-500">
+                    Close
+                </button>
+                {children}
+            </div>
+        </div>
+    );
+}
 function SideBarInfo() {
+    const [ModalOpen, setModalOpen] = useState(false);
+    const [usuarios, setUsuarios] = useState(null);
+    const [usuariosSelec, setUsuariosSelec] = useState([]);
+    const [usuarioBuscado, setUsuarioBuscado] = useState(null);
+
+    useEffect(() => {
+        console.log(usuarioBuscado);
+        fetch('usuarios?name=' + usuarioBuscado)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    setUsuarios(data);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+    }, [usuarioBuscado]);
+
+    const openModal = () => setModalOpen(true);
+    const closeModal = () => setModalOpen(false);
+    const handleClick = (usuario) => {
+        console.log(usuario);
+        setUsuariosSelec(prevState => [...prevState,usuario]);
+    }
+
+    const RemoveUser = (usuarioSelec) => {
+        setUsuariosSelec(prevState => prevState.filter(usuario => usuario.matricula !== usuarioSelec.matricula));
+    };
+
     const pagina = useLocation();
     console.log(pagina);
+
+    if (usuarios === null) return (<p>Cargando...</p>);
+
     if (pagina.pathname == '/Chats')
         return (
             <div className='SideBarInfo px-4 bg-comp-1 flex flex-col justify-between w-full'>
@@ -24,7 +71,45 @@ function SideBarInfo() {
                         </div>
                     </li>
                 </ul>
-                <button id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
+                <button onClick={openModal} id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
+                <Modal show={ModalOpen} handleClose={closeModal}>
+                    <h1 className="text-center font-bold text-4xl text-color">Crear <span className="text-secondary">Chat</span></h1>
+                    <form className="flex flex-col space-y-4">
+                        <div className="flex flex-col">
+                            <label htmlFor="ChatName" className="text-primary" >Nombre del Chat</label>
+                            <input id="ChatName" type="text" className="inputLine w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" />
+                        </div>
+
+                        <div className="flex flex-col">
+                            <label htmlFor="SearchMember" className="text-primary">Buscar Integrante</label>
+                            <input id="SearchMember" type="text" value={usuarioBuscado} onChange={(e) => setUsuarioBuscado(e.target.value)} className="inputLine w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" />
+                        </div>
+                        <div className="h-64 flex flex-col justify-between">
+                            <h2 className="font-bold text-lg text-color">Usuarios Encontrados: </h2>
+                            <ul className="flex flex-col h-full w-full overflow-y-scroll bg-color rounded-md p-2 text-primary text-sm space-y-2">
+                                {usuariosSelec && usuariosSelec.map(usuarioSelec => (
+                                    <li key={usuarioSelec.matricula} className="UserFound p-1 rounded-sm bg-primary text-comp-1 justify-between flex w-full">
+                                        <div><span>{usuarioSelec.nombreCompleto} </span>
+                                            <span>{usuarioSelec.iD_ArchivoFoto}</span>
+                                        </div>
+                                        <button onClick={() => RemoveUser(usuarioSelec)}><RemoveIcon /></button>
+                                    </li>
+                                ))}
+
+                                <div className="w-full h-px bg-primary"></div>
+                                {usuarios.filter(usuario =>
+                                    !usuariosSelec.some(selec => selec.matricula === usuario.matricula)
+                                ).map(usuario => (
+                                    <li onClick={() => handleClick(usuario)} key={usuario.matricula} className="UserFound p-1 rounded-sm">
+                                        <span>{usuario.nombreCompleto} </span>
+                                        <span>{usuario.iD_ArchivoFoto}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <button id="CreateChat" type="submit" className="w-1/2 self-center py-1 font-semibold rounded-md text-color">Crear</button>
+                    </form>
+                </Modal>
             </div>
 
         );
@@ -86,14 +171,14 @@ function SideBarInfo() {
                     </div>
                     <div>
                         <label htmlFor="TitleSelector" className="text-primary font-bold">Title</label>
-                    <select className="w-full py-2 rounded-xl bg-color text-color font-semibold outline-none" name="TitleSelector" id="TitleSelector">
-                        <option value="Title 0">Select a Title...</option>
-                        <option value="Title 1">La Cabra</option>
-                        <option value="Title 2">Calc's No. 1</option>
-                        <option value="Title 3">Pro Mathlete</option>
-                    </select>
+                        <select className="w-full py-2 rounded-xl bg-color text-color font-semibold outline-none" name="TitleSelector" id="TitleSelector">
+                            <option value="Title 0">Select a Title...</option>
+                            <option value="Title 1">La Cabra</option>
+                            <option value="Title 2">Calc's No. 1</option>
+                            <option value="Title 3">Pro Mathlete</option>
+                        </select>
                     </div>
-                    <input type="submit" value="Update" className="bg-primary py-2 rounded-xl font-bold"/>
+                    <input type="submit" value="Update" className="bg-primary py-2 rounded-xl font-bold" />
                 </form>
             </div>
         );

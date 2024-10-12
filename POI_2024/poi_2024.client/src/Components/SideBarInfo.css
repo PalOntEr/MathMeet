@@ -1,0 +1,9 @@
+.UserFound:hover,#CreateChat:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+
+}
+
+.UserFound,#CreateChat {
+    transition: 150ms;
+}
