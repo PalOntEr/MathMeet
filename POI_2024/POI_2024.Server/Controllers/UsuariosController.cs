@@ -17,13 +17,17 @@ namespace POI_2024.Server.Controllers
         }
 
         [HttpGet(Name = "GetUsuarios")]
-        public async IAsyncEnumerable<Usuario> Get()
+
+        public async Task<ActionResult<IEnumerable<Usuario>>> Get([FromQuery] string? name)
         {
-            var usuarios = await _context.Usuarios.ToListAsync();
-            foreach (var usuario in usuarios)
+            if (!string.IsNullOrWhiteSpace  (name))
             {
-                yield return usuario;
+                var UsersFound = await _context.Usuarios.Where(u => u.NombreCompleto.Contains(name)).ToListAsync();
+                return Ok(UsersFound);
             }
+
+            var Users = await _context.Usuarios.ToListAsync();
+            return Ok(Users);
         }
     }
 }
