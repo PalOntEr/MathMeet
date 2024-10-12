@@ -20,14 +20,15 @@ namespace POI_2024.Server.Controllers
 
 
         //Post para iniciar sesion 
-        [HttpPost]
+        [HttpPost (Name = "LogIn")] 
+
         public async Task<IActionResult> LogIn([FromBody] UserLoginRequest userToLog)
         {
 
             // Validamos si el modelo recibido es válido
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);  // Si el modelo no es válido, regresamos un error 400
+                return BadRequest(ModelState);// Si el modelo no es válido, regresamos un error 400
             }
 
             // buscamos el usuario en la base de datos
