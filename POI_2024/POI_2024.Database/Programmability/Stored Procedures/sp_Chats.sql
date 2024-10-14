@@ -26,7 +26,7 @@ BEGIN
 	END
 	ELSE IF @Op = 4
 	BEGIN 
-	SELECT  [Nombre],[UsuarioAdmin],[ArchivoFoto] FROM [dbo].[Chats]
+	SELECT  [Nombre],[UsuarioAdmin],[ID_ArchivoFoto] FROM [dbo].[Chats]
 	WHERE (ISNULL(@ID_Chat, [ID_Chat]) = [ID_Chat]) AND
 	(ISNULL(@Nombre, [Nombre]) = [Nombre]) AND
 	(ISNULL(@UsuarioAdmin, [UsuarioAdmin]) = [UsuarioAdmin]) AND

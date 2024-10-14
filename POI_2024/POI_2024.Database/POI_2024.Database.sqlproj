@@ -10,6 +10,8 @@
     <GenerateCreateScript>True</GenerateCreateScript>
     <IncludeSchemaNameInFileName>False</IncludeSchemaNameInFileName>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Tables" />
@@ -36,6 +38,9 @@
     <Build Include="Programmability\Stored Procedures\sp_Mensaje.sql" />
     <Build Include="Programmability\Stored Procedures\sp_Archivos.sql" />
     <Build Include="Programmability\Stored Procedures\sp_Premios.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Chats.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Tareas.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_ChatsUsuarios.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="POI_2024.Database.publish.xml" />

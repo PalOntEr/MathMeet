@@ -28,7 +28,7 @@ BEGIN
 		SELECT [UsuarioEmisor], [ChatReceptor], [Mensaje], [ID_Archivo], [ID_Mensaje] FROM [dbo].[Mensajes] WHERE
 			(ISNULL(@UsuarioEmisor, [UsuarioEmisor]) = [UsuarioEmisor]) AND
 			(ISNULL(@ChatReceptor, [ChatReceptor]) = [ChatReceptor]) AND
-			(ISNULL(@Mensaje, [Mensaje]) = [Mensaje]) AND
+			(ISNULL(@Mensaje, [Mensaje]) LIKE [Mensaje]) AND
 			(ISNULL(@ID_Archivo, [ID_Archivo]) = [ID_Archivo]) AND
 			(ISNULL(@ID_Mensaje, [ID_Mensaje]) = [ID_Mensaje])
 	END
