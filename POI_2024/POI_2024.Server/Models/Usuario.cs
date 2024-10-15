@@ -9,6 +9,11 @@
         public int CalCoins { get; set; }
     }
 
+    public class UserSelected
+    {
+        public int Matricula { set; get; }
+        public string Nombre { set; get; }
+    }   
     public class UserLoginRequest
     {
         public int Matricula { get; set; }
