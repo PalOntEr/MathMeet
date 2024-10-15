@@ -3,7 +3,7 @@ CREATE TABLE [dbo].[Mensajes] (
     [UsuarioEmisor] INT      NOT NULL,
     [ChatReceptor]  INT      NOT NULL,
     [Mensaje]       TEXT     NULL,
-    [FechaEnvio]    DATETIME DEFAULT (getdate()) NOT NULL,
+    [FechaEnvio]    DATETIME2 DEFAULT (getdate()) NOT NULL,
     [ID_Archivo]       INT      NULL,
     PRIMARY KEY CLUSTERED ([ID_Mensaje] ASC),
     FOREIGN KEY ([ID_Archivo]) REFERENCES [dbo].[Archivos] ([ID_Archivo]),
