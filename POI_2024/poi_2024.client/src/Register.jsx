@@ -7,12 +7,18 @@ const Register = () => {
   const [Nombre, setNombre] = useState('');
   const [Matricula, setMatricula] = useState('');
   const [Contraseña, setContraseña] = useState('');
+    const [VerifyContraseña, setVerifyContraseña] = useState('');
     const [IntentoRegister, setIntentoRegister] = useState(false);
     const navigate = useNavigate();
   const handleSubmit = async(e) => {
       e.preventDefault();  // Evita que la página se recargue al enviar el formulario
+
+      if (Contraseña !== VerifyContraseña) {
+          console.log("Las Contraseñas no coinciden");          setIntentoRegister(false);
+          return 0;
+      }
       setIntentoRegister(true);
-     
+      return 0;
       // Construir el objeto a enviar en la solicitud POS
   }
 
@@ -73,7 +79,7 @@ const Register = () => {
           </div>
           <div className="inputbox space-y-4">
             <p className="text-primary">Confirmar Contraseña</p>
-            <input className='inputLine w-full bg-transparent outline-none text-white border-b-2 border-[var(--primary-color)]' value={Contraseña} onChange={(e) => setContraseña(e.target.value)} name="Contraseña" type="password" />
+                          <input className='inputLine w-full bg-transparent outline-none text-white border-b-2 border-[var(--primary-color)]' value={VerifyContraseña} onChange={(e) => setVerifyContraseña(e.target.value)} name="Contraseña" type="password" />
           </div>
           <div className="btn flex justify-center">            
             <button id="btn-submit" className="bg-primary text-comp-1 px-6 py-0.5" type="submit"> Registrar </button>           
