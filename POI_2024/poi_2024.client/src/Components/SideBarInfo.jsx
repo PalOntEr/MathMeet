@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { UserContext } from '../UserContext';
+import { ChatContext } from '../ChatContext';
 import AddIcon from '@mui/icons-material/Add';
 import GroupImg from '../Images/DAMN.png'
 import './SideBarInfo.css'
@@ -25,11 +27,68 @@ const Modal = ({ show, handleClose, children }) => {
 function SideBarInfo() {
     const [ModalOpen, setModalOpen] = useState(false);
     const [usuarios, setUsuarios] = useState(null);
+    const [ChatName, setChatName] = useState(null);
     const [usuariosSelec, setUsuariosSelec] = useState([]);
+    const [ChatRegisterAtt, setChatRegisterAtt] = useState(false);
     const [usuarioBuscado, setUsuarioBuscado] = useState(null);
+    const [ChatsFound, setChatsFound] = useState([]);
+
+    const { user } = useContext(UserContext);
+    const { ChatID, ChatSelected } = useContext(ChatContext);
+
+    const handleClickChat = (e) => {
+        e.preventDefault();
+        setChatRegisterAtt(true);
+    }
+
+    console.log(ChatID);
+    useEffect(() => {
+        if (!ChatRegisterAtt) return;
+        const RegisterChat = async () => {
+            try {
+                const ChatRegister = {
+                    ChatInfo: {
+                        Nombre: ChatName,
+                        UsuarioAdmin: user.Matricula,
+                        ID_ArchivoFoto: 1
+                    },
+                    UsuarioList: usuariosSelec.map(user => ({ Matricula: user.matricula, Nombre: user.nombreCompleto }))
+                };
+
+        console.log(JSON.stringify(ChatRegister));
+                // Realiza la solicitud POST a la API
+                const response = await fetch('Chat', {  //la path de la api (sin el controller)
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ChatRegister),  // convierte el objeto a JSON (que es lo que espera la api)
+                });
+
+                const data = response.text();
+                console.log(data);
+                if (data) {
+                    console.log("Chat creado con exito.");
+                }
+                else { 
+                    throw new Error('Error en Crear un usuario'); 
+                }
+                setChatRegisterAtt(false);
+                setChatName("");
+                setUsuarioBuscado("");
+                setUsuariosSelec([]);
+                closeModal();       
+            } catch (error) {
+                console.error('Error al registrar el usuario:', error);
+                //alert("Hubo un error al registrar el usuario");
+            }
+
+        }
+
+        RegisterChat();
+    })
 
     useEffect(() => {
-        console.log(usuarioBuscado);
         fetch('usuarios?name=' + usuarioBuscado)
                 .then(response => response.json())
                 .then(data => {
@@ -41,8 +100,25 @@ function SideBarInfo() {
                 });
     }, [usuarioBuscado]);
 
+    useEffect(() => {
+        fetch('Chat?UserLoggedIn=' + Number(user.Matricula)).
+            then(response => response.json()).
+            then(data => {
+                setChatsFound(data);
+                console.log(ChatsFound);
+            }).
+            catch(error => {
+                console.error(error);
+            });
+    },[user.Matricula]);
+
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
+
+    const handleChatChange = (IDChatSelected) => {
+        ChatSelected(IDChatSelected);
+    }
+
     const handleClick = (usuario) => {
         console.log(usuario);
         setUsuariosSelec(prevState => [...prevState,usuario]);
@@ -53,7 +129,6 @@ function SideBarInfo() {
     };
 
     const pagina = useLocation();
-    console.log(pagina);
 
     if (usuarios === null) return (<p>Cargando...</p>);
 
@@ -61,15 +136,17 @@ function SideBarInfo() {
         return (
             <div className='SideBarInfo px-4 bg-comp-1 flex flex-col justify-between w-full'>
                 <ul className="overflow-y-auto flex flex-col min-h-[96]">
-                    <li id="Active" value="Group" className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
-                        <div className="flex flex-row w-full">
-                            <img src={GroupImg} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
-                            <div className="w-full justify-center flex flex-col">
-                                <h1 id="GroupName" className="text-xl xs:text-3xl text-color font-bold flex justify-between"> GRUPO 1 <span className="text-xs xs:text-sm font-bold text-background">9:54 AM</span></h1>
-                                <p id="LastMessageSent" className="text-xs xs:text-sm text-color">Ultimo Mensaje Enviado</p>
+                    {ChatsFound.map(ChatFound => (
+                        <li key={ChatFound.iD_Chat} onClick={() => { ChatSelected(ChatFound.iD_Chat) }} value={ChatFound.iD_Chat} className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
+                            <div id={ChatFound.iD_Chat == ChatID ? "activeChat" : ""}  className="flex flex-row w-full text-color px-2 py-3">
+                                <img src={GroupImg} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
+                                <div className="w-full justify-center flex flex-col">
+                                    <h1 id="GroupName" className="text-xl xs:text-3xl font-bold flex justify-between">{ChatFound.nombre}<span className="text-xs xs:text-sm font-bold text-background">9:54 AM</span></h1>
+                                    <p id="LastMessageSent" className="text-xs xs:text-sm">Ultimo Mensaje Enviado</p>
+                                </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
+                    ))}
                 </ul>
                 <button onClick={openModal} id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
                 <Modal show={ModalOpen} handleClose={closeModal}>
@@ -77,7 +154,7 @@ function SideBarInfo() {
                     <form className="flex flex-col space-y-4">
                         <div className="flex flex-col">
                             <label htmlFor="ChatName" className="text-primary" >Nombre del Chat</label>
-                            <input id="ChatName" type="text" className="inputLine w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" />
+                            <input id="ChatName" type="text" value={ChatName} onChange={(e) => setChatName(e.target.value)} className="inputLine w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" />
                         </div>
 
                         <div className="flex flex-col">
@@ -90,24 +167,24 @@ function SideBarInfo() {
                                 {usuariosSelec && usuariosSelec.map(usuarioSelec => (
                                     <li key={usuarioSelec.matricula} className="UserFound p-1 rounded-sm bg-primary text-comp-1 justify-between flex w-full">
                                         <div><span>{usuarioSelec.nombreCompleto} </span>
-                                            <span>{usuarioSelec.iD_ArchivoFoto}</span>
                                         </div>
                                         <button onClick={() => RemoveUser(usuarioSelec)}><RemoveIcon /></button>
                                     </li>
                                 ))}
-
-                                <div className="w-full h-px bg-primary"></div>
-                                {usuarios.filter(usuario =>
-                                    !usuariosSelec.some(selec => selec.matricula === usuario.matricula)
-                                ).map(usuario => (
+                            <li>
+                                    <div className="w-full h-px bg-primary"></div>
+                                </li>
+                                {usuarios
+                                    .filter(usuario => usuario.matricula !== Number(user.Matricula))
+                                    .filter(usuario => !usuariosSelec.some(selec => selec.matricula === usuario.matricula))
+                                    .map(usuario => (
                                     <li onClick={() => handleClick(usuario)} key={usuario.matricula} className="UserFound p-1 rounded-sm">
                                         <span>{usuario.nombreCompleto} </span>
-                                        <span>{usuario.iD_ArchivoFoto}</span>
                                     </li>
                                 ))}
                             </ul>
                         </div>
-                        <button id="CreateChat" type="submit" className="w-1/2 self-center py-1 font-semibold rounded-md text-color">Crear</button>
+                        <button id="CreateChat" onClick={handleClickChat } type="submit" className="w-1/2 self-center py-1 font-semibold rounded-md text-color">Crear</button>
                     </form>
                 </Modal>
             </div>
