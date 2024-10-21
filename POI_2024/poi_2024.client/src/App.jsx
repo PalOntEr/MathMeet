@@ -1,22 +1,28 @@
 import './App.css';
+import { UserProvider } from './UserContext';
+import { ChatProvider } from './ChatContext';
 import LogIn from './LogIn.jsx';
-import Chats from './Pages/Chats.jsx';
-import Shop from './Pages/Shop.jsx';
+import  Chats  from './Pages/Chats.jsx';
+import Shop  from './Pages/Shop.jsx';
 import VideoChat from './Pages/VideoChat.jsx';
 import Assignments from './Pages/Assignments.jsx';
 import Register from './Register.jsx';
 import Test from './Test.jsx';
 import ModifyUser from './Pages/ModifyUser.jsx';
 import SideBar from './Components/SideBar.jsx';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import ReviewAssignments from './Pages/ReviewAssignments.jsx';
 
 function App() {
     return (
-        <Router>
+        <ChatProvider>
+        <UserProvider>
+            <Router>
             <Main />
-        </Router>
+            </Router>
+            </UserProvider>
+        </ChatProvider>
     );
 }
 
