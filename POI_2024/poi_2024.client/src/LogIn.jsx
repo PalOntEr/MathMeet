@@ -1,5 +1,6 @@
-import './LogIn.css'
-import { useState, useEffect } from 'react';
+import './LogIn.css';
+import { useState, useEffect,useContext } from 'react';
+import { UserContext } from './UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 const LogIn = () => {
@@ -8,6 +9,8 @@ const LogIn = () => {
     const [Contraseña, setContraseña] = useState('');
     const [IntentoLogin, setIntentoLogin] = useState(false);
     const [mostrarDiv, setMostrarDiv] = useState(false);
+    const { LoginUsuario,user } = useContext(UserContext);
+
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();  // Evita que la página se recargue al enviar el formulario
@@ -38,6 +41,12 @@ const LogIn = () => {
                     throw new Error('Error en el inicio de sesion'); //si la contrseña es incorrecta o no existe el usuario
                 }
 
+                const data = await response.json();
+
+                LoginUsuario({
+                    Matricula: data.matricula,
+                    UserName: data.nombreCompleto
+                });
                 navigate('/Chats')//si todo sale bien re redirecciona a la pagina de chats
 
             } catch (error) {
