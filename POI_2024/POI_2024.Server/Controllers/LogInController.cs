@@ -22,7 +22,7 @@ namespace POI_2024.Server.Controllers
         //Post para iniciar sesion 
         [HttpPost (Name = "LogIn")] 
 
-        public async Task<IActionResult> LogIn([FromBody] UserLoginRequest userToLog)
+        public async Task<ActionResult<Usuario>> LogIn([FromBody] UserLoginRequest userToLog)
         {
 
             // Validamos si el modelo recibido es válido
@@ -47,7 +47,7 @@ namespace POI_2024.Server.Controllers
                 return Unauthorized(new { Message = "Contraseña incorrecta" });
             }
 
-            return Ok(new { Message = "Inicio de sesión exitoso" });
+            return Ok(user);
 
 
         }
