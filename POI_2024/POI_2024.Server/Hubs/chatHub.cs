@@ -20,7 +20,7 @@ namespace POI_2024.Server.Hubs
 
         public async Task SendMessage(string user, string message,string ChatID)
         {
-            await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message);
+            await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, DateTime.Now);
         }
     }
 }
