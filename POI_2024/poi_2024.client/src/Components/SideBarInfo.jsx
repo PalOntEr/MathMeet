@@ -33,7 +33,8 @@ function SideBarInfo() {
     const [usuarioBuscado, setUsuarioBuscado] = useState(null);
     const [ChatsFound, setChatsFound] = useState([]);
 
-    const { user } = useContext(UserContext);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
     const { ChatID, ChatSelected } = useContext(ChatContext);
 
     const handleClickChat = (e) => {
