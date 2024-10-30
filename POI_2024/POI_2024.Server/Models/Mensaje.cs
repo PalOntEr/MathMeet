@@ -9,7 +9,7 @@ namespace POI_2024.Server.Models
         public int ChatReceptor { get; set; }
         public string Mensaje { get; set; }
         public DateTime FechaEnvio { get; set; } = DateTime.Now;
-        public int ID_Archivo { get; set; }
+        public int? ID_Archivo { get; set; }
 
     }
 
@@ -19,5 +19,7 @@ namespace POI_2024.Server.Models
         public string Mensaje { get; set; }
         public DateTime FechaEnvio { get; set; }
         public string UsuarioEmisor { get; set; }
+
+        public Byte[] Archivo { get; set; }
     }
 }

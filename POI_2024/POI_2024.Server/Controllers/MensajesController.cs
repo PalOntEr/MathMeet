@@ -29,12 +29,20 @@ namespace POI_2024.Server.Controllers
             foreach (var Message in MessagesFound)
             {
                 var UsuarioName = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.NombreCompleto).FirstOrDefaultAsync();
+                Byte[] ArchiveFound = null;
+
+                if (Message.ID_Archivo != null)
+                {
+                   ArchiveFound = await _context.Archivos.Where(u => u.ID_Archivo == Message.ID_Archivo).Select(u => u.Contenido).FirstOrDefaultAsync();
+                }
+
                 var UsuarioMensajeFound = new UsuarioMensaje
                 {
                     ID_Mensaje = Message.ID_Mensaje,
-                    Mensaje = Message.Mensaje,
+                    Mensaje = Message.Mensaje ?? "",
                     FechaEnvio = Message.FechaEnvio,
-                    UsuarioEmisor = UsuarioName
+                    UsuarioEmisor = UsuarioName,
+                    Archivo = ArchiveFound
                 };
                 ListOfMessages.Add(UsuarioMensajeFound);
             }
