@@ -42,6 +42,7 @@ export default defineConfig({
         }
     },
     server: {
+        host: true,
         proxy: {
             '^/weatherforecast': {
                 target,
@@ -63,6 +64,18 @@ export default defineConfig({
                 target,
                 changeOrigin: true,
                 ws: true,
+                secure: false
+            },
+            '^/Chat': {
+                target,
+                secure: false
+            },
+            '^/Mensajes': {
+                target,
+                secure: false
+            },
+            '^/UserEmotes': {
+                target,
                 secure: false
             }
         },
