@@ -14,14 +14,14 @@ import Chat from '../Components/Chat.jsx';
 import OutgoingMessage from '../Components/OutgoingMessage.jsx';
 
 import { Link } from 'react-router-dom'
-const Modal = ({ show, handleclose, children }) => {
+const Modal = ({ show, handleClose, children }) => {
     if (!show) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-comp-1 w-1/2 p-6 space-y-4 rounded-lg shadow-lg">
-                <button onClick={handleclose} className="mb-4 text-red-500">
-                    close
+                <button onClick={handleClose} className="mb-4 text-red-500">
+                    Close
                 </button>
                 {children}
             </div>
@@ -61,7 +61,7 @@ const Chats = () => {
         console.log(membersAddedFinal);
         const AddMembers = async () => {
             try {
-                const response = await fetch('Chats/' + ChatID, {
+                const response = await fetch('Chat/' + ChatID, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
@@ -148,34 +148,38 @@ const Chats = () => {
                                 <li key={member.matricula}> { member.nombre}</li>
                             )) }
                         </ul>
-                        <button id="agregarintegrante" onClick={openModal} className="flex font-bold items-center bg-primary w-full justify-center py-1 rounded-xl xs:text-lg text-xs"><AddIcon/> Agregar Integrante </button>
+                        <button id="AgregarIntegrante" onClick={openModal} className="flex font-bold items-center bg-primary w-full justify-center py-1 rounded-xl xs:text-lg text-xs"><AddIcon/> Agregar Integrante </button>
                         <Modal show={ModalOpen} handleClose={closeModal}>
-                            <h1 className="font-bold text-4xl text-center text-color">buscar <span className="text-secondary">integrante</span></h1>
+                            <h1 className="font-bold text-4xl text-center text-color">Buscar <span className="text-secondary">Integrante</span></h1>
                             <form>
-                                <label htmlFor="adduser" className="font-semibold text-color">integrante:</label>
-                                <input id="adduser" value={memberBuscado} onChange={(e) => { setMemberBuscado(e.target.value) }} type="text" className="inputline w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" />
+                                <label htmlFor="AsddUser" className="font-semibold text-color">Integrante:</label>
+                                <input id="AddUser" value={memberBuscado} onChange={(e) => { setMemberBuscado(e.target.value) }} type="text" className="inputline w-full bg-transparent outline-none border-b-2 text-white border-[var(--primary-color)]" />
                                 <ul className="flex flex-col h-full w-full overflow-y-scroll bg-color rounded-md p-2 text-primary text-sm space-y-2">
                                     {membersAdded && membersAdded.map(usuarioselec => (
-                                    <li key={usuarioselec.matricula} className="userfound p-1 rounded-sm bg-primary text-comp-1 justify-between flex w-full">
-                                        <div><span>{usuarioselec.nombrecompleto} </span>
+                                    <li key={usuarioselec.matricula} className="UserFound p-1 rounded-sm bg-primary text-comp-1 justify-between flex w-full">
+                                        <div><span>{usuarioselec.nombreCompleto} </span>
                                             </div>
-                                            <button onClick={() => RemoveMemberAdded(usuarioselec)}><removeicon /></button>
+                                            <button onClick={() => RemoveMemberAdded(usuarioselec)}><RemoveIcon /></button>
                                     </li>
                                 ))}
-                                <li>
-                                    <div className="w-full h-px bg-primary"></div>
-                                    </li>
+                                    {() => {
+                                        if (membersAdded) return (
+                                            <li>
+                                            <div className="w-full h-px bg-primary"></div>
+                                        </li>);
+                                    }}
+
                                     {memberstoAdd
                                     .filter(usuario => usuario.matricula !== Number(user.matricula))
                                         .filter(usuario => !members.some(selec => selec.matricula === usuario.matricula))
                                         .filter(usuario => !membersAdded.some(selec => selec.matricula === usuario.matricula))
                                         .map(usuario => (
-                                            <li onClick={() => handleClick(usuario)} key={usuario.matricula} className="userfound p-1 rounded-sm">
-                                            <span>{usuario.nombrecompleto} </span>
+                                            <li onClick={() => handleClick(usuario)} key={usuario.matricula} className="UserFound p-1 rounded-sm">
+                                            <span>{usuario.nombreCompleto} </span>
                                         </li>
                                     ))}
                                 </ul>
-                                <button id="createChat" onClick={handleClickAddMembers} type="submit" className="w-1/2 self-center py-1 font-semibold rounded-md text-color">agregar</button>
+                                <button id="CreateChat" onClick={handleClickAddMembers} type="submit" className="w-1/2 self-center py-1 font-semibold rounded-md text-color">Agregar</button>
                             </form>
                         </Modal> 
                     </div>
