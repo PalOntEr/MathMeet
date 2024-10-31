@@ -27,15 +27,18 @@ namespace POI_2024.Server.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendMessage(string user, string message,int? IDEmote, string ChatID)
+        public async Task SendMessage(string user, string message,int? IDArchive, string ChatID)
         {
-            Byte[] EmoteFound = null;
 
-            if (IDEmote != null)
+            if (IDArchive != null)
             {
-                EmoteFound = await _context.Archivos.Where(u => u.ID_Archivo == IDEmote).Select(u => u.Contenido).FirstOrDefaultAsync();
+                var ArchiveFound = await _context.Archivos.Where(u => u.ID_Archivo == IDArchive).FirstOrDefaultAsync();
+                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, ArchiveFound, DateTime.Now);
             }
-            await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message,EmoteFound, DateTime.Now);
+            else
+            {
+                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, null, DateTime.Now);
+            }
         }
     }
 }
