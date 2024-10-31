@@ -20,6 +20,6 @@ namespace POI_2024.Server.Models
         public DateTime FechaEnvio { get; set; }
         public string UsuarioEmisor { get; set; }
 
-        public Byte[] Archivo { get; set; }
+        public Archivo Archivo { get; set; }
     }
 }
