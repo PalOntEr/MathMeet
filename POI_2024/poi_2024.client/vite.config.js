@@ -77,6 +77,10 @@ export default defineConfig({
             '^/UserEmotes': {
                 target,
                 secure: false
+            },
+            '^/Archivos': {
+                target,
+                secure: false
             }
         },
         port: 5173,
