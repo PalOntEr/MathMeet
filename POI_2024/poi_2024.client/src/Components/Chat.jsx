@@ -1,4 +1,4 @@
-﻿import { useState, useEffect,useContext } from 'react';
+﻿import { useState, useEffect, useContext, useRef } from 'react';
 import { ChatContext } from '../ChatContext';
 import { UserContext } from '../UserContext';
 import Emote1 from '../Images/Calc Emote1.png';
@@ -8,17 +8,34 @@ import OutgoingMessage from '../Components/OutgoingMessage.jsx';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Emotes from '../Components/Emotes.jsx';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 const Chat = () => {
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [message, setMessage] = useState('');
     const [showEmojis, setShowEmojis] = useState(false);
     const [connection, setConnection] = useState(null);
     const { ChatID } = useContext(ChatContext);
     const [msgAttempt, setMsgAttempt] = useState(false);
-    const [emote,setEmote] = useState([]);
+    const [emote, setEmote] = useState([]);
+    const fileInputRef = useRef(null);
+    const [file, setFile] = useState(null);
+    const [fileAttempt, setFileAttempt] = useState(false);
+    const [idArchive, setIdArchive] = useState(null);
+
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]);
+        if (file) {
+            console.log("Archivo Seleccionado: " + file.name);
+        }
+    }
+
+    const handleFileClick = () => {
+        fileInputRef.current.click();
+    }
 
     useEffect(() => {
         if (!msgAttempt) return;
@@ -27,7 +44,7 @@ const Chat = () => {
             usuarioEmisor: user.Matricula,
             chatReceptor: ChatID,
             mensaje: message,
-            ID_Archivo: emote.EmoteID
+            ID_Archivo: emote.EmoteID ? emote.EmoteID : idArchive
         };
 
         const RegisterMessage = async () => {
@@ -46,7 +63,8 @@ const Chat = () => {
                 if (!response.ok) {
                     throw new Error('Error en la solicitud');
                 }
-
+                setFile(null);
+                setIdArchive(null);
                 console.log('Mensaje registrado con éxito:', data);
                 //alert("Usuario registrado con éxito");
             } catch (error) {
@@ -56,7 +74,51 @@ const Chat = () => {
         }
         RegisterMessage();
         setMsgAttempt(false);
-    }, [msgAttempt]);
+    }, [msgAttempt, emote]);
+
+    useEffect(() => {
+        if (!fileAttempt) return;
+
+        const fileReader = new FileReader();
+
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = () => {
+            const arrayBuffer = fileReader.result;
+            const base64stringFile = btoa(new Uint8Array(arrayBuffer)
+                .reduce((data, byte) => data + String.fromCharCode(byte), ""));
+
+            const FileToUpload = {
+                Nombre: file.name,
+                MIMEType: file.type,
+                tamano: file.size,
+                Contenido: base64stringFile
+            };
+
+            const RegisterFile = async () => {
+                try {
+                    const response = await fetch('Archivos', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(FileToUpload),
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error("Error en la solicitud");
+                    }
+                    setIdArchive(data.iD_Archivo);
+                    console.log(idArchive);
+                    setFileAttempt(false);
+                    console.log("Archivo registrado con exito: " + data);
+                }
+                catch (error) {
+                    console.log("Eror al registrar archivo: " + error);
+                }
+            }
+            RegisterFile();
+        }
+    }, [fileAttempt])
 
     useEffect(() => {
         setMessages([]);
@@ -68,12 +130,11 @@ const Chat = () => {
                     sender: item.usuarioEmisor,
                     type: item.usuarioEmisor === user.UserName ? "outcoming" : "incoming",
                     DateSent: item.fechaEnvio,
-                    Emote: item.archivo
-                }));
+                    Archive: item.archivo
+                }));   
                 setMessages(RestructuredMessage);
-                console.log(messages);
             });
-       const connection = new signalR.HubConnectionBuilder()
+        const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chatHub", {
                 withCredentials: true
             })
@@ -81,7 +142,7 @@ const Chat = () => {
             .build();
 
         connection.start()
-            .then(async() => {
+            .then(async () => {
                 console.log("Connected to SignalR hub");
                 setConnection(connection);
 
@@ -91,9 +152,9 @@ const Chat = () => {
             })
             .catch(err => console.error("SignalR connection error: ", err));
 
-        connection.on("ReceiveMessage", (sender, receivedMessage, EmoteSent, DateOfSent) => {
-            console.log(EmoteSent);
-            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Emote: EmoteSent}]);
+        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent) => {
+            console.log(ArchiveSent);
+            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent }]);
         });
 
         return () => {
@@ -101,67 +162,100 @@ const Chat = () => {
         };
     }, [ChatID]);
 
-    const sendMessage = async (EmoteSent) => {
-        if (connection && message) { 
+    useEffect(() => {
+        if (idArchive) {
+            sendMessageWithFile();
+        }
+    }, [idArchive]);
+
+    const sendEmote = async (ArchiveSent) => {
+        if (connection && !message)
             try {
-                console.log("ola 2");
-                await connection.invoke('SendMessage', user.UserName, message,null, ChatID.toString());
                 setMsgAttempt(true);
+                await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString());
                 setMessage("");
             } catch (err) {
                 console.log("Mamaste: " + err);
             }
-        }
-        if (connection && !message && EmoteSent) {
+    }
+    const sendMessageWithFile = async () => {
+        if (connection && (message || file)) {
             try {
-                console.log("olaaaaa2");
-                console.log(EmoteSent);
-                await connection.invoke('SendMessage', user.UserName, message, EmoteSent.EmoteID, ChatID.toString());
+                console.log(file);
+                console.log(idArchive);
                 setMsgAttempt(true);
+                await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString());
                 setMessage("");
+                setFile(null);
             } catch (err) {
                 console.log("Mamaste: " + err);
             }
         }
     };
 
-    const handleEnter = async (event) => {
-        if (event.key == 'Enter') {
-            sendMessage();
+    const sendMessage = async () => {
+        if (file) {
+            console.log(file);
+            setFileAttempt(true);
         }
-    };
-
-    const handleEmote = (data) => {
-        setMessage("");
-        sendMessage(data);
+        else {
+            sendMessageWithFile();
+        }
     }
 
-    return (
-        <div className="flex flex-col w-full h-full overflow-y-scroll">
-            <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll">
-                {messages.map((msg, index) => (
-                    msg.type === "incoming" ?
-                        (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Emote={msg.Emote} />) :
-                        (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Emote={msg.Emote} />)
-                ))}
-                </div>
-            <div id="MessageInput-Container"className="flex h-[5%] justify-center items-center space-x-2">
-                <div id="btn-container" className="">
-                    <button id="AddFile"><AddIcon className=" text-primary" /></button>
-                </div>
-                <div className='btn-container'>
-                    <button onClick={() => { setShowEmojis(!showEmojis) }} id="Emojis"><EmojiEmotionsIcon className="Icon-container text-primary" /></button>
-                </div>
-                <div className="w-full">
-                    <input type="text" onKeyDown={handleEnter}  className="w-full bg-transparent border-b-2 border-[var(--primary-color)] text-white outline-none" id="Message" value={message} onChange={(e) => setMessage(e.target.value)}></input>
-                </div>
-                <div className='btn-container'>
-                    <button onClick={sendMessage} id="SendMessage"><SendIcon className="Icon-container text-primary" /> </button>
+const handleEnter = async (event) => {
+    if (event.key == 'Enter') {
+        setEmote([]);
+        sendMessage();
+    }
+};
+
+const handleEmote = (data) => {
+    setMessage("");
+    setEmote(data);
+    sendEmote(data);
+}
+const removeFile = () => {
+    setFile(null);
+    fileInputRef.current.value = "";
+}
+
+return (
+    <div className="flex flex-col w-full h-full overflow-y-scroll">
+        <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll">
+            {messages && messages.map((msg, index) => (
+                msg.type === "incoming" ?
+                    (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} />) :
+                    (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} />)
+            ))}
+        </div>
+        {file && (
+            <div className="flex">
+                <div className="flex bg-comp-1 rounded-sm p-2 items-center">
+                    <InsertDriveFileIcon className="text-color" />
+                    <p className="text-color font-bold text-sm">{file.name}</p>
+                    <button className="text-xs" onClick={removeFile}><RemoveIcon /> </button>
                 </div>
             </div>
-            <Emotes show={showEmojis} EmoteSent={handleEmote} /> 
+        )}
+        <div id="MessageInput-Container" className="flex h-[5%] justify-center items-center space-x-2">
+            <div id="btn-container" className="">
+                <input type="file" className="hidden" ref={fileInputRef} onChange={handleFileChange}></input>
+                <button id="AddFile"><AddIcon className="text-primary" onClick={handleFileClick} /></button>
+            </div>
+            <div className='btn-container'>
+                <button onClick={() => { setShowEmojis(!showEmojis) }} id="Emojis"><EmojiEmotionsIcon className="Icon-container text-primary" /></button>
+            </div>
+            <div className="w-full">
+                <input type="text" onKeyDown={handleEnter} className="w-full bg-transparent border-b-2 border-[var(--primary-color)] text-white outline-none" id="Message" value={message} onChange={(e) => setMessage(e.target.value)}></input>
+            </div>
+            <div className='btn-container'>
+                <button onClick={() => { sendMessage() }} id="SendMessage"><SendIcon className="Icon-container text-primary" /> </button>
+            </div>
         </div>
-    );
+        <Emotes show={showEmojis} EmoteSent={handleEmote} />
+    </div>
+);
 };
 
 export default Chat;

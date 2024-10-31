@@ -11,7 +11,6 @@ function Emotes({ show, EmoteSent }) {
                 data => { setEmotesFound(data) });
     }, []);
 
-    console.log(emotesFound);
     if (!show) return null;
 
     const sendEmote = (imageSelected, ID) => {
