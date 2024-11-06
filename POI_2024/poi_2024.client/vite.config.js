@@ -81,6 +81,20 @@ export default defineConfig({
             '^/Archivos': {
                 target,
                 secure: false
+            },
+            '^/Tareas': {
+                target,
+                secure: false
+            },
+            '^/UsersTareas': {
+                target,
+                secure: false
+            },
+            '^/VideochatHub': {
+                target,
+                changeOrigin: true,
+                ws: true,
+                secure: false
             }
         },
         port: 5173,
