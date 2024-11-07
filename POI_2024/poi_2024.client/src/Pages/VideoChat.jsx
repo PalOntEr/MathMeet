@@ -1,11 +1,23 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import './VideoChat.css'
 import { HubConnectionBuilder } from '@microsoft/signalr';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+import CallEndIcon from '@mui/icons-material/CallEnd';
+import Chat from '../Components/Chat.jsx';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChatContext } from '../ChatContext';
 
 const VideoChat = () => {
     const connectionRef = useRef(null);
+    const { ChatID } = useContext(ChatContext);
     const peerConnectionRef = useRef(null);
     const localVideoRef = useRef(null);
+    const [mic, setMic] = useState(false);
+    const navigate = useNavigate();
+    const [cam, setCam] = useState(false);
     const remoteVideoRef = useRef(null);
     const hasReceivedOfferRef = useRef(false); // Change to useRef
     const targetConnectionIdRef = useRef(null); // Change to useRef
@@ -28,7 +40,27 @@ const VideoChat = () => {
                 console.log("Sending to targetConnectionId:", targetConnectionIdRef.current);
             });
 
+            newConnection.on("UserJoined", (_callerConnectionID) => {
+                console.log("Este tilino se unio", _callerConnectionID);
+            });
+
+            newConnection.on("UserLeft", (_callerConnectionID) => {
+                console.log("Este tilino se fue", _callerConnectionID);
+            });
+
             await newConnection.start();
+
+            const joinGroup = async (groupName) => {
+                try {
+                    await newConnection.invoke("JoinGroup", groupName);
+                    console.log("Unido al grupo gg");
+                }
+                catch (error) {
+                    console.error("Error al unirse al grupo de la videollamada", error);
+                }
+            }
+
+            joinGroup(ChatID.toString());
 
             const localConnection = newConnection.connectionId;
             localConnectionIdRef.current = localConnection; // Set ref value
@@ -57,11 +89,12 @@ const VideoChat = () => {
                 console.log(`Sending Track - ID: ${track.id}, Kind: ${track.kind}, Muted: ${track.muted}`);
                 pc.addTrack(track, stream)
             });
-
+            setMic(true);
+            setCam(true);
             pc.onicecandidate = (event) => {
                 try {
                     if (event.candidate && connectionRef.current && targetConnectionIdRef.current) {
-                        connectionRef.current.invoke("SendIceCandidate", JSON.stringify(event.candidate), targetConnectionIdRef.current);
+                        connectionRef.current.invoke("SendIceCandidate", JSON.stringify(event.candidate), targetConnectionIdRef.current, ChatID.toString());
                     }
                 }
                 catch (error) {
@@ -131,7 +164,7 @@ const VideoChat = () => {
                     console.log(peerConnectionRef);
 
                     console.log("Answer sent to caller", answer);
-                    connectionRef.current.invoke("SendAnswer", JSON.stringify(answer), targetConnectionIdRef.current);
+                    connectionRef.current.invoke("SendAnswer", JSON.stringify(answer), targetConnectionIdRef.current, ChatID.toString());
                 } else {
                     console.error("targetConnectionId not set for sending answer.");
                 }
@@ -150,7 +183,7 @@ const VideoChat = () => {
                 try {
                     const ParsedAnswer = JSON.parse(answer);
                     await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(ParsedAnswer));
-                console.log(peerConnectionRef);
+                    console.log(peerConnectionRef);
                 }
                 catch (error) {
                     console.log("Chingas a tu madre cabron", error)
@@ -161,7 +194,7 @@ const VideoChat = () => {
     };
 
     const handleNewICECandidate = async (candidate) => {
-        if (peerConnectionRef.current) { 
+        if (peerConnectionRef.current) {
             try {
                 const ParsedCandidate = JSON.parse(candidate);
                 await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(ParsedCandidate));
@@ -174,7 +207,7 @@ const VideoChat = () => {
 
     const startCall = async () => {
         if (connectionRef.current) {
-            await connectionRef.current.invoke("StartCall");
+            await connectionRef.current.invoke("StartCall", ChatID.toString());
         }
 
         console.log("Starting call.");
@@ -187,7 +220,7 @@ const VideoChat = () => {
             console.log("Target Connection to send: ", targetConnectionIdRef.current);
             // Include targetConnectionId when sending offer
             try {
-                connectionRef.current.invoke("SendOffer", JSON.stringify(offer), targetConnectionIdRef.current);
+                connectionRef.current.invoke("SendOffer", JSON.stringify(offer), targetConnectionIdRef.current, ChatID.toString());
             }
             catch (error) {
                 console.log("Error sending the offer", error);
@@ -195,41 +228,89 @@ const VideoChat = () => {
         }
     };
 
-
-    useEffect(() => {
-        const currentVideo = remoteVideoRef.current;
-        if (currentVideo && currentVideo.srcObject) {
-            const mediaStream = currentVideo.srcObject; // Get the MediaStream from srcObject
-            console.log("Current srcObject of remote video:", mediaStream);
-
-            // Iterate over tracks in the MediaStream
-            mediaStream.getTracks().forEach(track => {
-                console.log(`Track ID: ${track.id}, Kind: ${track.kind}, Muted: ${track.muted} , enabled ${track.enabled}`);
+    const handleMicClick = () => {
+        if (localVideoRef.current && localVideoRef.current.srcObject) {
+            setMic(!mic);
+            localVideoRef.current.srcObject.getAudioTracks().forEach(track => {
+                track.enabled = !track.enabled;
             });
         }
-    }, []);
+    }
 
-
-    const refreshRemoteVideo = () => {
-        if (remoteVideoRef.current) {
-            const remoteTracks = remoteVideoRef.current.srcObject.getTracks();
-            remoteTracks.forEach(track => {
-                if (track.kind === 'video' || track.kind === 'audio') {
-                    // Check if the track is muted and enable it
-                    track.enabled = true; // Unmute the track
-                    console.log("Track unmuted!");
-                }
+    const handleCamClick = () => {
+        if (localVideoRef.current && localVideoRef.current.srcObject) {
+            setCam(!cam);
+            localVideoRef.current.srcObject.getVideoTracks().forEach(track => {
+                track.enabled = !track.enabled;
             });
         }
-    };
+    }
+
+    const EndCall = () => {
+        if (localVideoRef.current && localVideoRef.current.srcObject) {
+            localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+        }
+
+        if (remoteVideoRef.current && remoteVideoRef.current.srcObject) {
+            remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+        }
+
+        if (peerConnectionRef.current) {
+            peerConnectionRef.current.close();
+            peerConnectionRef.current = null;
+        }
+
+        if (connectionRef.current) {
+            connectionRef.current.stop().then(() => {
+                console.log("Disconnected from videochat");
+                connectionRef.current = null;
+            });
+        }
+
+        connectionRef.current.invoke("LeaveGroup", ChatID.toString());
+
+        navigate("/Chats");
+    }
+
     return (
-        <div>
-            <video className="w-full h-auto" ref={localVideoRef} autoPlay muted/>
-            <video ref={remoteVideoRef} autoPlay playsInline/> 
-            <button onClick={startCall} className="text-color">Start Call</button>
-            <button onClick={refreshRemoteVideo} className="text-color">Refresh Remote Video</button>
+        <div className="h-full w-full flex">
+            <div className="flex flex-col w-2/3 h-full justify-center">
+                <div className="flex w-full justify-center">
+                    <video className="w-2/3" ref={remoteVideoRef} autoPlay playsInline />
+                </div>
+                <div className="flex w-full">
+                    <div className="flex items-center w-full justify-evenly">
+                        <button onClick={handleMicClick} className="text-color"><Microphone OnOrOff={mic} /></button>
+                        <button onClick={handleCamClick} className="text-color"><Videocam OnOrOff={cam} /></button>
+                        <button onClick={EndCall} className="text-color"><CallEndIcon style={{ fontSize: "64px" }} /></button>
+                    </div>
+                    <div className="w-1/3">
+                        <video className="w-full h-auto" ref={localVideoRef} autoPlay muted />
+                    </div>
+                </div>
+                <button onClick={startCall} className="text-color">Empezar Llamada</button>
+            </div>
+            <div className="w-1/3 h-full bg-comp-1">
+            <Chat />
+            </div>
         </div>
     );
 };
+
+function Microphone(props) {
+    return (
+        <div>
+            {props.OnOrOff ? (<MicIcon style={{ fontSize: "64px" }} />) : (<MicOffIcon style={{ fontSize: "64px" }} />)}
+        </div>
+    )
+}
+
+function Videocam(props) {
+    return (
+        <div>
+            {props.OnOrOff ? (<VideocamIcon style={{ fontSize: "64px" }} />) : (<VideocamOffIcon style={{ fontSize: "64px" }} />)}
+        </div>
+    )
+}
 
 export default VideoChat;

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using POI_2024.Server.DBContext;
 using Microsoft.EntityFrameworkCore;
-using POI_2024.Server.Models;
-using System.Threading.Tasks;
 
 
 namespace POI_2024.Server.Hubs
@@ -27,17 +25,19 @@ namespace POI_2024.Server.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendMessage(string user, string message,int? IDArchive, string ChatID)
+        public async Task SendMessage(string user, string message,int? IDArchive, string ChatID, int UserID)
         {
 
+            var UserFound = await _context.Usuarios.Where(u => u.Matricula == UserID).Select(u => u.ID_ArchivoFoto).FirstOrDefaultAsync();
+            var FotoFound = await _context.Archivos.Where(u => u.ID_Archivo == UserFound).FirstOrDefaultAsync();
             if (IDArchive != null)
             {
                 var ArchiveFound = await _context.Archivos.Where(u => u.ID_Archivo == IDArchive).FirstOrDefaultAsync();
-                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, ArchiveFound, DateTime.Now);
+                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, ArchiveFound, DateTime.Now,FotoFound);
             }
             else
             {
-                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, null, DateTime.Now);
+                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, null, DateTime.Now,FotoFound);
             }
         }
     }
