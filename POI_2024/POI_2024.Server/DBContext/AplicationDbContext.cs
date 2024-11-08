@@ -16,6 +16,9 @@ namespace POI_2024.Server.DBContext
             modelBuilder.Entity<Mensajes>().HasKey(u => u.ID_Mensaje);
             modelBuilder.Entity<Archivo>().HasKey(u => u.ID_Archivo);
             modelBuilder.Entity<UsuariosPremios>().HasKey(u => u.UsuarioPremio);
+            modelBuilder.Entity<Tareas>().HasKey(u => u.ID_Tareas);
+            modelBuilder.Entity<StatusTareas>().HasKey(u => u.IDStatusTarea);
+            modelBuilder.Entity<ArchivosTareas>().HasKey(u => new { u.Matricula, u.ID_Archivo, u.ID_Tarea});
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
@@ -24,6 +27,9 @@ namespace POI_2024.Server.DBContext
         public DbSet<Mensajes> Mensajes { get; set; }
         public DbSet<Archivo> Archivos { get; set; }
         public DbSet<UsuariosPremios> UsuariosPremios { get; set; }
+        public DbSet<Tareas> Tareas { get; set; }
+        public DbSet<StatusTareas> StatusTareas { get; set; }
+        public DbSet<ArchivosTareas> ArchivosTareas { get; set; }
     }
 }
 
