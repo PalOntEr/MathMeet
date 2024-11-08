@@ -21,5 +21,6 @@ namespace POI_2024.Server.Models
         public string UsuarioEmisor { get; set; }
 
         public Archivo Archivo { get; set; }
+        public Archivo UserFoto { get; set; }
     }
 }
