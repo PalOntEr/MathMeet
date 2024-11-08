@@ -5,7 +5,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import DownloadIcon from '@mui/icons-material/Download';
 
 
-const OutgoingMessage = ({ message, sender, DateSent, Archive }) => {
+const OutgoingMessage = ({ message, sender, DateSent, Archive,userFoto }) => {
 
     const [downloadAttempt, setDownloadAttempt] = useState(false);
     const [idFiletoDownload, setIdFiletoDownload] = useState(false);
@@ -48,7 +48,10 @@ const OutgoingMessage = ({ message, sender, DateSent, Archive }) => {
     if (Archive && Archive.iD_Archivo <= 5)
         return (
             <div className="outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3">
-                <div className="outgoing-message-sender text-color opacity-60">{sender}</div>
+                <div className="flex items-center">
+                    <img className="h-10 rounded-full" src={"data:image/*;base64," + userFoto.contenido} />
+                    <div className="outgoing-message-sender text-color opacity-60 text-xs">{sender}</div>
+                </div>
                 <img className="outgoing-message-content text-color" src={"data:image/*;base64," + Archive.contenido}></img>
                 <div className="outgoing-message-time text-color opacity-40 text-end">{formattedDate}</div>
             </div>
@@ -56,13 +59,16 @@ const OutgoingMessage = ({ message, sender, DateSent, Archive }) => {
 
 
     return (
-        <div className="outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3">
-            <div className="outgoing-message-sender text-color opacity-60">{sender}</div>
+        <div className="outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3 space-y-2">
+            <div className="flex items-center">
+                <img className="h-10 rounded-full" src={"data:image/*;base64," + userFoto.contenido} />
+                <div className="outgoing-message-sender text-color opacity-60 text-xs">{sender}</div>
+            </div>
             {Archive && (
                 <div className="outgoing-message-content flex bg-primary text-comp-1 font-bold justify-between p-2 rounded-md items-center">
                     <InsertDriveFileIcon />
                     <p className="">{Archive.nombre}</p>
-                    <div id={Archive.iD_Archivo} onClick={DownloadFile }>
+                    <div className="cursor-pointer" id={Archive.iD_Archivo} onClick={DownloadFile }>
                         <DownloadIcon />
                     </div>
                 </div>

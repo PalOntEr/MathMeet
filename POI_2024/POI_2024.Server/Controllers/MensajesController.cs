@@ -28,20 +28,23 @@ namespace POI_2024.Server.Controllers
             List<UsuarioMensaje> ListOfMessages = new List<UsuarioMensaje>();
             foreach (var Message in MessagesFound)
             {
-                var UsuarioName = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.NombreCompleto).FirstOrDefaultAsync();
+                var UsuarioName = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.NombreCompleto ).FirstOrDefaultAsync();
+                var UsuarioFoto = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.ID_ArchivoFoto ).FirstOrDefaultAsync();
                 Archivo ArchiveFound = null;
                 if (Message.ID_Archivo != null)
                 {
                    ArchiveFound = await _context.Archivos.Where(u => u.ID_Archivo == Message.ID_Archivo).FirstOrDefaultAsync();
                 }
-
+                Archivo Foto = await _context.Archivos.Where(u => u.ID_Archivo == UsuarioFoto).FirstOrDefaultAsync();
+                
                 var UsuarioMensajeFound = new UsuarioMensaje
                 {
                     ID_Mensaje = Message.ID_Mensaje,
                     Mensaje = Message.Mensaje ?? "",
                     FechaEnvio = Message.FechaEnvio,
                     UsuarioEmisor = UsuarioName,
-                    Archivo = ArchiveFound
+                    Archivo = ArchiveFound,
+                    UserFoto = Foto
                 };
                 ListOfMessages.Add(UsuarioMensajeFound);
             }

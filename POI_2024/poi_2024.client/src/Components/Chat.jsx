@@ -121,6 +121,7 @@ const Chat = () => {
     }, [fileAttempt])
 
     useEffect(() => {
+        if (!ChatID) return;
         setMessages([]);
         fetch('Mensajes?ID_Chat=' + ChatID).
             then(response => response.json()).
@@ -130,8 +131,10 @@ const Chat = () => {
                     sender: item.usuarioEmisor,
                     type: item.usuarioEmisor === user.UserName ? "outcoming" : "incoming",
                     DateSent: item.fechaEnvio,
-                    Archive: item.archivo
-                }));   
+                    Archive: item.archivo,
+                    userFoto: item.userFoto
+                }));
+                console.log(RestructuredMessage);
                 setMessages(RestructuredMessage);
             });
         const connection = new signalR.HubConnectionBuilder()
@@ -152,9 +155,9 @@ const Chat = () => {
             })
             .catch(err => console.error("SignalR connection error: ", err));
 
-        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent) => {
+        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser) => {
             console.log(ArchiveSent);
-            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent }]);
+            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent, userFoto: FotoUser  }]);
         });
 
         return () => {
@@ -172,7 +175,7 @@ const Chat = () => {
         if (connection && !message)
             try {
                 setMsgAttempt(true);
-                await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString());
+                await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula);
                 setMessage("");
             } catch (err) {
                 console.log("Mamaste: " + err);
@@ -184,7 +187,7 @@ const Chat = () => {
                 console.log(file);
                 console.log(idArchive);
                 setMsgAttempt(true);
-                await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString());
+                await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula);
                 setMessage("");
                 setFile(null);
             } catch (err) {
@@ -225,8 +228,8 @@ return (
         <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll">
             {messages && messages.map((msg, index) => (
                 msg.type === "incoming" ?
-                    (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} />) :
-                    (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} />)
+                    (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />) :
+                    (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />)
             ))}
         </div>
         {file && (
