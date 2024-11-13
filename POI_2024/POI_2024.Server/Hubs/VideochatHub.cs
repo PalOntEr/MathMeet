@@ -11,7 +11,17 @@ public class VideoChatHub : Hub
     }
 
     private static string _callerConnectionId;
+    public async Task AcceptCall(string callerId)
+    {
+        // Notify the caller that the call has been accepted
+        await Clients.Client(callerId).SendAsync("callAccepted");
+    }
 
+    public async Task DenyCall(string callerId)
+    {
+        // Notify the caller that the call was denied
+        await Clients.Client(callerId).SendAsync("callDenied");
+    }
     public async Task JoinGroup(string groupName)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
@@ -24,12 +34,13 @@ public class VideoChatHub : Hub
         await Clients.Group(groupName).SendAsync("UserLeft", Context.ConnectionId);
     }
 
-    public async Task StartCall(string ChatID)
+    public async Task StartCall(string ChatID, string targetConnectionId)
     {
         _callerConnectionId = Context.ConnectionId;
         _logger.LogInformation($"Call started by: {_callerConnectionId}");
         Console.WriteLine("ID of Chat:" + ChatID);
         await Clients.Group(ChatID).SendAsync("CallStartedBy", _callerConnectionId);
+        await Clients.GroupExcept(ChatID,targetConnectionId).SendAsync("incomingCall", Context.ConnectionId);
     }
 
     public async Task SendOffer(string offer, string targetConnectionId,string ChatID)
