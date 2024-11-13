@@ -45,7 +45,9 @@ const LogIn = () => {
 
                 LoginUsuario({
                     Matricula: data.matricula,
-                    UserName: data.nombreCompleto
+                    UserName: data.nombreCompleto,
+                    Encrypt: data.encrypt,
+                    NombreCompleto: data.nombreCompleto
                 });
                 navigate('/Chats')//si todo sale bien re redirecciona a la pagina de chats
 

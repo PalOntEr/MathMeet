@@ -10,6 +10,7 @@ namespace POI_2024.Server.Models
         public string Mensaje { get; set; }
         public DateTime FechaEnvio { get; set; } = DateTime.Now;
         public int? ID_Archivo { get; set; }
+        public bool? Encrypted { get; set; }
 
     }
 
@@ -20,6 +21,7 @@ namespace POI_2024.Server.Models
         public DateTime FechaEnvio { get; set; }
         public string UsuarioEmisor { get; set; }
 
+        public bool? Encrypted { get; set; } 
         public Archivo Archivo { get; set; }
         public Archivo UserFoto { get; set; }
     }

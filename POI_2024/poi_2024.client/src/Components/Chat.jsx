@@ -11,8 +11,9 @@ import AddIcon from '@mui/icons-material/Add';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Emotes from '../Components/Emotes.jsx';
 import RemoveIcon from '@mui/icons-material/Remove';
+import CryptoJS from 'crypto-js';
 
-const Chat = () => {
+const Chat = (props) => {
     const [messages, setMessages] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [message, setMessage] = useState('');
@@ -21,10 +22,12 @@ const Chat = () => {
     const { ChatID } = useContext(ChatContext);
     const [msgAttempt, setMsgAttempt] = useState(false);
     const [emote, setEmote] = useState([]);
+    const [membersConnected, setMembersConnected] = useState([]);
     const fileInputRef = useRef(null);
     const [file, setFile] = useState(null);
     const [fileAttempt, setFileAttempt] = useState(false);
     const [idArchive, setIdArchive] = useState(null);
+    const secretkey = 'my-very-secure-key-123';
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
@@ -44,7 +47,8 @@ const Chat = () => {
             usuarioEmisor: user.Matricula,
             chatReceptor: ChatID,
             mensaje: message,
-            ID_Archivo: emote.EmoteID ? emote.EmoteID : idArchive
+            ID_Archivo: emote.EmoteID ? emote.EmoteID : idArchive,
+            Encrypted: user.Encrypt
         };
 
         const RegisterMessage = async () => {
@@ -121,19 +125,29 @@ const Chat = () => {
     }, [fileAttempt])
 
     useEffect(() => {
+        props.onMembersConnected(membersConnected);
+    }, [membersConnected]);
+
+    useEffect(() => {
         if (!ChatID) return;
         setMessages([]);
+        setMembersConnected([]);
         fetch('Mensajes?ID_Chat=' + ChatID).
             then(response => response.json()).
             then(data => {
-                const RestructuredMessage = data.map(item => ({
-                    message: item.mensaje,
-                    sender: item.usuarioEmisor,
-                    type: item.usuarioEmisor === user.UserName ? "outcoming" : "incoming",
-                    DateSent: item.fechaEnvio,
-                    Archive: item.archivo,
-                    userFoto: item.userFoto
-                }));
+                const RestructuredMessage = data.map(item => {
+                    if (item.encrypted) {
+                        item.mensaje = decryptMessage(item.mensaje, secretkey);
+                    }
+                    return ({
+                        message: item.mensaje,
+                        sender: item.usuarioEmisor,
+                        type: item.usuarioEmisor === user.UserName ? "outcoming" : "incoming",
+                        DateSent: item.fechaEnvio,
+                        Archive: item.archivo,
+                        userFoto: item.userFoto
+                    })
+                });
                 console.log(RestructuredMessage);
                 setMessages(RestructuredMessage);
             });
@@ -150,12 +164,21 @@ const Chat = () => {
                 setConnection(connection);
 
                 if (ChatID) {
-                    await connection.invoke("JoinChat", ChatID.toString());
+                    await connection.invoke("JoinChat", ChatID.toString(), user.Matricula);
                 }
             })
             .catch(err => console.error("SignalR connection error: ", err));
 
-        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser) => {
+        connection.on("UserConnected", (Matricula) => {
+            console.log("This User Is Connected", Matricula);
+            setMembersConnected(prevMembersConnected => [...prevMembersConnected, Matricula]);
+        });
+
+        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser,Encrypted) => {
+            if(Encrypted)
+            {
+                receivedMessage = decryptMessage(receivedMessage,secretkey);
+            }
             console.log(ArchiveSent);
             setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent, userFoto: FotoUser  }]);
         });
@@ -186,8 +209,17 @@ const Chat = () => {
             try {
                 console.log(file);
                 console.log(idArchive);
+                if (user.Encrypt) {
+                    setMessage(encryptMessage(message, secretkey));
+                }
                 setMsgAttempt(true);
-                await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula);
+                if (user.Encrypt) {
+                    const FinalMessage = encryptMessage(message, secretkey);
+                    await connection.invoke('SendMessage', user.UserName, FinalMessage, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
+                }
+                else {
+                    await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
+                }
                 setMessage("");
                 setFile(null);
             } catch (err) {
@@ -205,6 +237,15 @@ const Chat = () => {
             sendMessageWithFile();
         }
     }
+
+    const encryptMessage = (message, key) => {
+        return CryptoJS.AES.encrypt(message, key).toString();
+    };
+
+    const decryptMessage = (encryptedMessage, key) => {
+        const bytes = CryptoJS.AES.decrypt(encryptedMessage, key);
+        return bytes.toString(CryptoJS.enc.Utf8);
+    };
 
 const handleEnter = async (event) => {
     if (event.key == 'Enter') {
