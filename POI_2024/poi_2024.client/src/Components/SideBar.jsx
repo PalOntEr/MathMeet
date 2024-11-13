@@ -11,7 +11,7 @@ import { useLocation } from 'react-router-dom';
 function SideBar() {
     const location = useLocation();
     const locationpaths = "/ModifyUser";
-    const locationpaths2 = "/VideoChat";
+    const locationpaths2 = "/videochat";
     var SideBarWidth;
     var SideBar2Width;
     var SideBarColor;
