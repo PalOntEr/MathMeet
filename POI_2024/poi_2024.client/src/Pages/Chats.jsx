@@ -70,8 +70,8 @@ const Chats = () => {
 
     const handleUsersConnected = (data) => {
         setMembersConnectedOfChat(data);
-        console.log(data);
     }
+
     const RemoveMemberAdded = (memberSelected) => {
         setMembersAdded(prevState => prevState.filter(usuario => usuario.matricula !== memberSelected.matricula));
     }
@@ -119,7 +119,6 @@ const Chats = () => {
                     .map(item => ({
                         Archive: item.archivo
                     }));
-                console.log(RestructuredArchive);
                 setArchives(RestructuredArchive);
 
             });
@@ -219,10 +218,8 @@ const Chats = () => {
         fetch("Chat/" + ChatID.toString() + "?IDChat=" + ChatID).
             then(response => response.json()).
             then(data => {
-                console.log(data.chatInfo);
                 setChatInfo(data.chatInfo);
                 setMembers(data.integrantes);
-                console.log(members);
                 if (data.chatInfo.usuarioAdmin === Number(user.Matricula)) {
                     setUserAdmin(true);
                 }
@@ -247,7 +244,6 @@ const Chats = () => {
         fetch('usuarios?name=' + memberBuscado)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 setMemberstoAdd(data);
             })
             .catch(error => {
@@ -286,9 +282,6 @@ const Chats = () => {
         }
     }
 
-    useState(() => {
-        setMembers(members);
-    }, [membersConnectedOfChat]);
     return (
         <div id="content-container" className="flex h-screen w-2/3 xs:w-3/4">
             <div id="chat-container" className="flex flex-col justify-between h-full w-3/4 px-2">
@@ -314,7 +307,7 @@ const Chats = () => {
                         <ul className="bg-color rounded-xl p-3 text-color h-48 text-xs space-y-4 overflow-y-auto flex flex-col">
                             {members && members.map(member => (
                                 <li key={member.matricula} className="flex items-center space-x-5">
-                                    {membersConnectedOfChat.includes(member.matricula) ?
+                                    {membersConnectedOfChat.includes(member.matricula.toString()) ?
                                         (<div className="bg-secondary w-2 h-1/2 rounded-full"></div>) :
                                     (<div className="bg-red-900 w-2 h-1/2 rounded-full"></div>)}
                                     <p>{member.nombre}</p>
