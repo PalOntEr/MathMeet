@@ -90,6 +90,10 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/ArchivosTareas': {
+                target,
+                secure: false
+            },
             '^/VideochatHub': {
                 target,
                 changeOrigin: true,
