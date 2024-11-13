@@ -5,7 +5,6 @@ CREATE TABLE [dbo].[Tareas] (
     [FechaFinalizacion] DATETIME     NULL,
     [Descripcion]       TEXT         NOT NULL,
     [Nombre]            VARCHAR (30) NOT NULL,
-    [Estatus]           INT          NOT NULL,
     [CalCoins]          INT          NOT NULL,
     PRIMARY KEY CLUSTERED ([ID_Tareas] ASC),
     FOREIGN KEY ([ID_Chat]) REFERENCES [dbo].[Chats] ([ID_Chat])

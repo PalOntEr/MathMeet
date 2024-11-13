@@ -42,6 +42,7 @@ export default defineConfig({
         }
     },
     server: {
+        host: true,
         proxy: {
             '^/weatherforecast': {
                 target,
@@ -49,6 +50,54 @@ export default defineConfig({
             },
             '^/usuarios': {
                 target,
+                secure: false
+            },
+            '^/CreateUser': {
+                target,
+                secure: false
+            },
+            '^/LogIn': {
+                target,
+                secure: false
+            },
+            '^/chatHub': {
+                target,
+                changeOrigin: true,
+                ws: true,
+                secure: false
+            },
+            '^/Chat': {
+                target,
+                secure: false
+            },
+            '^/Mensajes': {
+                target,
+                secure: false
+            },
+            '^/UserEmotes': {
+                target,
+                secure: false
+            },
+            '^/Archivos': {
+                target,
+                secure: false
+            },
+            '^/Tareas': {
+                target,
+                secure: false
+            },
+            '^/UsersTareas': {
+                target,
+                secure: false
+            },
+            '^/ArchivosTareas': {
+                target,
+                secure: false
+            },
+            '^/VideochatHub': {
+                target,
+                changeOrigin: true,
+                ws: true,
                 secure: false
             }
         },

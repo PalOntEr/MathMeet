@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[sp_Archivos]
+	CREATE PROCEDURE [dbo].[sp_Archivos]
 	@Op TINYINT,
 	@ID_Archivo INT = NULL,
 	@Nombre VARCHAR(255) = NULL,

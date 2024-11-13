@@ -2,16 +2,16 @@ import './SideBar.css'
 import { useState } from 'react';
 import { SideBarData } from './SideBarData'
 import PersonIcon from '@mui/icons-material/Person';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import SideBarInfo from './SideBarInfo.jsx'
 import Dropdown from 'rsuite/Dropdown';
 import 'react-dropdown/style.css';
-import { useLocation } from 'react-router-dom/cjs/react-router-dom.min.js';
+import { useLocation } from 'react-router-dom';
 
 function SideBar() {
     const location = useLocation();
     const locationpaths = "/ModifyUser";
-    const locationpaths2 = "/VideoChat";
+    const locationpaths2 = "/videochat";
     var SideBarWidth;
     var SideBar2Width;
     var SideBarColor;
