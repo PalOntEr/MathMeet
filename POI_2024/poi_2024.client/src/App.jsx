@@ -1,6 +1,7 @@
 import './App.css';
 import { UserProvider } from './UserContext';
 import { ChatProvider } from './ChatContext';
+import { AssignmentProvider } from './AssignmentContext';
 import LogIn from './LogIn.jsx';
 import  Chats  from './Pages/Chats.jsx';
 import Shop  from './Pages/Shop.jsx';
@@ -17,10 +18,12 @@ import ReviewAssignments from './Pages/ReviewAssignments.jsx';
 function App() {
     return (
         <ChatProvider>
-        <UserProvider>
+            <UserProvider>
+        <AssignmentProvider>
             <Router>
             <Main />
-            </Router>
+                    </Router>
+                </AssignmentProvider>
             </UserProvider>
         </ChatProvider>
     );
