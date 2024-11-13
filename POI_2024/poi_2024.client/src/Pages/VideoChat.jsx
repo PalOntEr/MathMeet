@@ -16,6 +16,9 @@ const VideoChat = () => {
     const peerConnectionRef = useRef(null);
     const localVideoRef = useRef(null);
     const [mic, setMic] = useState(false);
+    const [callAcepted, setCallAcepted] = useState(false);
+    const [incomingCall, setIncomingCall] = useState(false);
+    const [callerID, setCallerID] = useState(null);
     const navigate = useNavigate();
     const [cam, setCam] = useState(false);
     const remoteVideoRef = useRef(null);
@@ -37,7 +40,6 @@ const VideoChat = () => {
             newConnection.on("CallStartedBy", (_callerConnectionId) => {
                 console.log("Call Started By, ", _callerConnectionId);
                 targetConnectionIdRef.current = _callerConnectionId; // Set ref value
-                console.log("Sending to targetConnectionId:", targetConnectionIdRef.current);
             });
 
             newConnection.on("UserJoined", (_callerConnectionID) => {
@@ -66,6 +68,14 @@ const VideoChat = () => {
             localConnectionIdRef.current = localConnection; // Set ref value
             connectionRef.current = newConnection;
             console.log("Connected to SignalR.");
+
+            newConnection.on("incomingCall", (callerID) => {
+                if (localConnectionIdRef.current !== callerID) {
+                    console.log("Caller Incoming: ", callerID);
+                    setIncomingCall(true);
+                    setCallerID(callerID);
+                }
+            });
         };
 
         connect();
@@ -86,7 +96,6 @@ const VideoChat = () => {
             });
 
             stream.getTracks().forEach(track => {
-                console.log(`Sending Track - ID: ${track.id}, Kind: ${track.kind}, Muted: ${track.muted}`);
                 pc.addTrack(track, stream)
             });
             setMic(true);
@@ -98,31 +107,21 @@ const VideoChat = () => {
                     }
                 }
                 catch (error) {
-                    console.log("Error on Ice Candidate: ", error);
+                    console.error("Error on Ice Candidate: ", error);
                 }
             };
 
             pc.ontrack = (event) => {
                 if (event.streams && event.streams[0]) {
                     remoteVideoRef.current.srcObject = event.streams[0];
-                    console.log("Remote stream set:", remoteVideoRef.current.srcObject);
-                    console.log("Remote stream received:", event.streams[0]);
-                    console.log("Stream active:", event.streams[0].active);
                     const receivedTrack = event.track;
-                    console.log("Received Track:", receivedTrack);
-                    console.log("Is track enabled:", receivedTrack.enabled);
-                    console.log("Is track muted:", receivedTrack.muted);
                     if (receivedTrack.kind === 'video' || receivedTrack.kind === 'audio') {
                         receivedTrack.enabled = true; // Unmute the track
-                        console.log("Is track muted:", receivedTrack.muted);
-                        console.log("Is track enabled:", receivedTrack.enabled);
-                        console.log(`Unmuted ${receivedTrack.kind} track:`, receivedTrack.track);
                     }
 
                     // Set the remote video source to the received stream
                     if (event.streams && event.streams[0]) {
                         remoteVideoRef.current.srcObject = event.streams[0];
-                        console.log("Remote stream set:", remoteVideoRef.current.srcObject);
                     }
                 }
             };
@@ -148,7 +147,6 @@ const VideoChat = () => {
 
             // Step 3: Set the remote description with the caller's offer
             const parsedOffer = JSON.parse(offer);
-            console.log("Offer Received:", parsedOffer);
 
             try {
                 await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(parsedOffer));
@@ -161,9 +159,6 @@ const VideoChat = () => {
 
                 // Step 6: Send the answer back to the caller using targetConnectionId
                 if (targetConnectionIdRef.current) {
-                    console.log(peerConnectionRef);
-
-                    console.log("Answer sent to caller", answer);
                     connectionRef.current.invoke("SendAnswer", JSON.stringify(answer), targetConnectionIdRef.current, ChatID.toString());
                 } else {
                     console.error("targetConnectionId not set for sending answer.");
@@ -179,14 +174,12 @@ const VideoChat = () => {
         if (!hasReceivedAnswerRef.current) {
             hasReceivedAnswerRef.current = true;
             if (peerConnectionRef.current) {
-                console.log("Answer Received", JSON.parse(answer));
                 try {
                     const ParsedAnswer = JSON.parse(answer);
                     await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(ParsedAnswer));
-                    console.log(peerConnectionRef);
                 }
                 catch (error) {
-                    console.log("Chingas a tu madre cabron", error)
+                    console.error("Chingas a tu madre cabron", error)
                 }
 
             }
@@ -200,32 +193,42 @@ const VideoChat = () => {
                 await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(ParsedCandidate));
             }
             catch (error) {
-                console.log("CHINGASATUMADRE CABRON", error);
+                console.error("CHINGASATUMADRE CABRON", error);
             }
         }
     };
 
+    useEffect(() => {
+        // Assuming 'connection' is your SignalR instance that has been initialized
+        if (connectionRef.current) {
+            // Listener for call accepted
+            connectionRef.current.on('callAccepted', () => {
+                // Proceed with WebRTC connection setup (e.g., start camera, create offer)
+                console.log("Somebody accepted the call");
+            });
+
+            // Listener for call denied
+            connectionRef.current.on('callDenied', () => {
+            });
+
+            // Clean up listeners on component unmount or connection change
+            return () => {
+                connectionRef.current.off('incomingCall');
+                connectionRef.current.off('callAccepted');
+                connectionRef.current.off('callDenied');
+            };
+        }
+
+    }, [connectionRef.current, incomingCall]); 
+
+
     const startCall = async () => {
         if (connectionRef.current) {
-            await connectionRef.current.invoke("StartCall", ChatID.toString());
+            await connectionRef.current.invoke("StartCall", ChatID.toString(), localConnectionIdRef.current.toString());
         }
 
-        console.log("Starting call.");
         await initializeMedia();
-
-        if (peerConnectionRef.current && targetConnectionIdRef.current) {
-            const offer = await peerConnectionRef.current.createOffer();
-            await peerConnectionRef.current.setLocalDescription(offer);
-            console.log("Offer to send:", offer);
-            console.log("Target Connection to send: ", targetConnectionIdRef.current);
-            // Include targetConnectionId when sending offer
-            try {
-                connectionRef.current.invoke("SendOffer", JSON.stringify(offer), targetConnectionIdRef.current, ChatID.toString());
-            }
-            catch (error) {
-                console.log("Error sending the offer", error);
-            }
-        }
+        console.log("Starting call.");
     };
 
     const handleMicClick = () => {
@@ -272,6 +275,31 @@ const VideoChat = () => {
         navigate("/Chats");
     }
 
+    const handleAcceptCall = async () => {
+        setIncomingCall(false);
+        await initializeMedia();
+        setTimeout(async () => {
+            connectionRef.current.invoke("acceptCall", callerID);
+            if (peerConnectionRef.current && targetConnectionIdRef.current) {
+                const offer = await peerConnectionRef.current.createOffer();
+                await peerConnectionRef.current.setLocalDescription(offer);
+                console.log("Offer to send:", offer);
+                console.log("Target Connection to send: ", targetConnectionIdRef.current);
+                // Include targetConnectionId when sending offer
+                try {
+                    connectionRef.current.invoke("SendOffer", JSON.stringify(offer), targetConnectionIdRef.current, ChatID.toString());
+                }
+                catch (error) {
+                    console.log("Error sending the offer", error);
+                }
+            }
+        }, 500);
+    };
+
+    const handleDenyCall = () => {
+        setIncomingCall(false);
+        connectionRef.current.invoke("denyCall", callerID);
+    }
     return (
         <div className="h-full w-full flex">
             <div className="flex flex-col w-2/3 h-full justify-center">
@@ -289,9 +317,16 @@ const VideoChat = () => {
                     </div>
                 </div>
                 <button onClick={startCall} className="text-color">Empezar Llamada</button>
+                {incomingCall && (<div className="items-center flex flex-col justify-center mt-8">
+                    <p className="text-color">Llamada Entrante...</p>
+                    <div className="space-x-5">
+                        <button className="bg-primary p-2 rounded-md" onClick={handleAcceptCall}>Aceptar</button>
+                        <button className="bg-primary p-2 rounded-md" onClick={handleDenyCall}>Rechazar</button>
+                    </div>
+                </div>)}
             </div>
             <div className="w-1/3 h-full bg-comp-1">
-            <Chat />
+                <Chat onMembersConnected={} />
             </div>
         </div>
     );
