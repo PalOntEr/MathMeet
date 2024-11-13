@@ -14,7 +14,8 @@ const Register = () => {
       e.preventDefault();  // Evita que la página se recargue al enviar el formulario
 
       if (Contraseña !== VerifyContraseña) {
-          console.log("Las Contraseñas no coinciden");          setIntentoRegister(false);
+          console.log("Las Contraseñas no coinciden");
+          setIntentoRegister(false);
           return 0;
       }
       setIntentoRegister(true);
