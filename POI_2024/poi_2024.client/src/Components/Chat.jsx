@@ -148,12 +148,12 @@ const Chat = (props) => {
                         userFoto: item.userFoto
                     })
                 });
-                console.log(RestructuredMessage);
                 setMessages(RestructuredMessage);
             });
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chatHub", {
-                withCredentials: true
+                withCredentials: true,
+                queryParams: { Matricula: user.Matricula, chatID: ChatID },
             })
             .withAutomaticReconnect()
             .build();
@@ -174,13 +174,24 @@ const Chat = (props) => {
             setMembersConnected(prevMembersConnected => [...prevMembersConnected, Matricula]);
         });
 
-        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser,Encrypted) => {
-            if(Encrypted)
-            {
-                receivedMessage = decryptMessage(receivedMessage,secretkey);
+        connection.on("UpdateActiveUsers", (activeUsers) => {
+            console.log(activeUsers);
+            setMembersConnected(prevMembersConnected => [...prevMembersConnected, activeUsers]);
+        });
+
+        connection.on("UserDisconnected", (Matricula => {
+            console.log("Este user se salio gg", Matricula);
+            setMembersConnected(prevMembersConnected =>
+            prevMembersConnected.filter(member => member !== Matricula)
+            );
+        }));
+
+        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser, Encrypted) => {
+            if (Encrypted) {
+                receivedMessage = decryptMessage(receivedMessage, secretkey);
             }
             console.log(ArchiveSent);
-            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent, userFoto: FotoUser  }]);
+            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent, userFoto: FotoUser }]);
         });
 
         return () => {
@@ -247,59 +258,59 @@ const Chat = (props) => {
         return bytes.toString(CryptoJS.enc.Utf8);
     };
 
-const handleEnter = async (event) => {
-    if (event.key == 'Enter') {
-        setEmote([]);
-        sendMessage();
+    const handleEnter = async (event) => {
+        if (event.key == 'Enter') {
+            setEmote([]);
+            sendMessage();
+        }
+    };
+
+    const handleEmote = (data) => {
+        setMessage("");
+        setEmote(data);
+        sendEmote(data);
     }
-};
+    const removeFile = () => {
+        setFile(null);
+        fileInputRef.current.value = "";
+    }
 
-const handleEmote = (data) => {
-    setMessage("");
-    setEmote(data);
-    sendEmote(data);
-}
-const removeFile = () => {
-    setFile(null);
-    fileInputRef.current.value = "";
-}
-
-return (
-    <div className="flex flex-col w-full h-full overflow-y-scroll">
-        <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll">
-            {messages && messages.map((msg, index) => (
-                msg.type === "incoming" ?
-                    (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />) :
-                    (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />)
-            ))}
-        </div>
-        {file && (
-            <div className="flex">
-                <div className="flex bg-comp-1 rounded-sm p-2 items-center">
-                    <InsertDriveFileIcon className="text-color" />
-                    <p className="text-color font-bold text-sm">{file.name}</p>
-                    <button className="text-xs" onClick={removeFile}><RemoveIcon /> </button>
+    return (
+        <div className="flex flex-col w-full h-full overflow-y-scroll">
+            <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll">
+                {messages && messages.map((msg, index) => (
+                    msg.type === "incoming" ?
+                        (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />) :
+                        (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />)
+                ))}
+            </div>
+            {file && (
+                <div className="flex">
+                    <div className="flex bg-comp-1 rounded-sm p-2 items-center">
+                        <InsertDriveFileIcon className="text-color" />
+                        <p className="text-color font-bold text-sm">{file.name}</p>
+                        <button className="text-xs" onClick={removeFile}><RemoveIcon /> </button>
+                    </div>
+                </div>
+            )}
+            <div id="MessageInput-Container" className="flex h-[5%] justify-center items-center space-x-2">
+                <div id="btn-container" className="">
+                    <input type="file" className="hidden" ref={fileInputRef} onChange={handleFileChange}></input>
+                    <button id="AddFile"><AddIcon className="text-primary" onClick={handleFileClick} /></button>
+                </div>
+                <div className='btn-container'>
+                    <button onClick={() => { setShowEmojis(!showEmojis) }} id="Emojis"><EmojiEmotionsIcon className="Icon-container text-primary" /></button>
+                </div>
+                <div className="w-full">
+                    <input type="text" onKeyDown={handleEnter} className="w-full bg-transparent border-b-2 border-[var(--primary-color)] text-white outline-none" id="Message" value={message} onChange={(e) => setMessage(e.target.value)}></input>
+                </div>
+                <div className='btn-container'>
+                    <button onClick={() => { sendMessage() }} id="SendMessage"><SendIcon className="Icon-container text-primary" /> </button>
                 </div>
             </div>
-        )}
-        <div id="MessageInput-Container" className="flex h-[5%] justify-center items-center space-x-2">
-            <div id="btn-container" className="">
-                <input type="file" className="hidden" ref={fileInputRef} onChange={handleFileChange}></input>
-                <button id="AddFile"><AddIcon className="text-primary" onClick={handleFileClick} /></button>
-            </div>
-            <div className='btn-container'>
-                <button onClick={() => { setShowEmojis(!showEmojis) }} id="Emojis"><EmojiEmotionsIcon className="Icon-container text-primary" /></button>
-            </div>
-            <div className="w-full">
-                <input type="text" onKeyDown={handleEnter} className="w-full bg-transparent border-b-2 border-[var(--primary-color)] text-white outline-none" id="Message" value={message} onChange={(e) => setMessage(e.target.value)}></input>
-            </div>
-            <div className='btn-container'>
-                <button onClick={() => { sendMessage() }} id="SendMessage"><SendIcon className="Icon-container text-primary" /> </button>
-            </div>
+            <Emotes show={showEmojis} EmoteSent={handleEmote} />
         </div>
-        <Emotes show={showEmojis} EmoteSent={handleEmote} />
-    </div>
-);
+    );
 };
 
 export default Chat;
