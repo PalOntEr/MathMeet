@@ -5,6 +5,7 @@ CREATE TABLE [dbo].[Mensajes] (
     [Mensaje]       TEXT     NULL,
     [FechaEnvio]    DATETIME2 DEFAULT (getdate()) NOT NULL,
     [ID_Archivo]       INT      NULL,
+    [Encrypted] BIT NULL, 
     PRIMARY KEY CLUSTERED ([ID_Mensaje] ASC),
     FOREIGN KEY ([ID_Archivo]) REFERENCES [dbo].[Archivos] ([ID_Archivo]),
     FOREIGN KEY ([ChatReceptor]) REFERENCES [dbo].[Chats] ([ID_Chat]),
