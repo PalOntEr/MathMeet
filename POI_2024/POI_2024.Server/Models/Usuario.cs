@@ -7,6 +7,8 @@
         public string? Contrasena { get; set; }
         public int? ID_ArchivoFoto { get; set; }
         public int? CalCoins { get; set; }
+        public int? status { get; set; }
+        public bool? Encrypt { get; set; }
     }
 
     public class UserSelected
