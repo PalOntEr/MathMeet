@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("POI_2024.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77d2bf8620a3231d6826e463122745196d9e9735")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5d8b90a949eb25c04ea4dcff69e4c84491552ca")]
 [assembly: System.Reflection.AssemblyProductAttribute("POI_2024.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("POI_2024.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

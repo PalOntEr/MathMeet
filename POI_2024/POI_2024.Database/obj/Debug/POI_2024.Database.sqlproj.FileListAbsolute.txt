@@ -1,0 +1,6 @@
+C:\Users\maxan\Documents\FCFM\LMAD\Séptimo semestre\Clases\Programación orientada a internet\Repository\POI_2024\POI_2024.Database\bin\Debug\POI_2024.Database.dacpac
+C:\Users\maxan\Documents\FCFM\LMAD\Séptimo semestre\Clases\Programación orientada a internet\Repository\POI_2024\POI_2024.Database\obj\Debug\POI_2024.Database.sqlproj.AssemblyReference.cache
+C:\Users\maxan\Documents\FCFM\LMAD\Séptimo semestre\Clases\Programación orientada a internet\Repository\POI_2024\POI_2024.Database\obj\Debug\POI_2024.Database.dll
+C:\Users\maxan\Documents\FCFM\LMAD\Séptimo semestre\Clases\Programación orientada a internet\Repository\POI_2024\POI_2024.Database\obj\Debug\POI_2024.Database.pdb
+C:\Users\maxan\Documents\FCFM\LMAD\Séptimo semestre\Clases\Programación orientada a internet\Repository\POI_2024\POI_2024.Database\bin\Debug\POI_2024.Database.dll
+C:\Users\maxan\Documents\FCFM\LMAD\Séptimo semestre\Clases\Programación orientada a internet\Repository\POI_2024\POI_2024.Database\bin\Debug\POI_2024.Database.pdb

@@ -305,14 +305,20 @@ const Chats = () => {
                     <h3 className="text-xs xs:text-lg font-bold text-primary"> integrantes: </h3>
                     <div id="memberslist" className="space-y-2">
                         <ul className="bg-color rounded-xl p-3 text-color h-48 text-xs space-y-4 overflow-y-auto flex flex-col">
-                            {members && members.map(member => (
-                                <li key={member.matricula} className="flex items-center space-x-5">
-                                    {membersConnectedOfChat.includes(member.matricula.toString()) ?
-                                        (<div className="bg-secondary w-2 h-1/2 rounded-full"></div>) :
-                                    (<div className="bg-red-900 w-2 h-1/2 rounded-full"></div>)}
-                                    <p>{member.nombre}</p>
-                                </li>
-                            ))}
+                            {members && members.map(member => {
+                                const isConnected = membersConnectedOfChat.some(connectedMember => Number(connectedMember) === member.matricula);
+                                console.log(`Member: ${member.matricula}, Connected: ${isConnected}`);
+                                return (
+                                    <li key={member.matricula} className="flex items-center space-x-5">
+                                        {isConnected ? (
+                                            <div className="bg-secondary w-2 h-1/2 rounded-full"></div>
+                                        ) : (
+                                            <div className="bg-red-900 w-2 h-1/2 rounded-full"></div>
+                                        )}
+                                        <p>{member.nombre}</p>
+                                    </li>
+                                );
+                            })}
                         </ul>
                         <button id="AgregarIntegrante" onClick={openModal} className="flex font-bold items-center bg-primary w-full justify-center py-1 rounded-xl xs:text-lg text-xs"><AddIcon /> Agregar Integrante </button>
                     </div>
