@@ -28,6 +28,7 @@ namespace POI_2024.Server.Controllers
             List<UsuarioMensaje> ListOfMessages = new List<UsuarioMensaje>();
             foreach (var Message in MessagesFound)
             {
+             
                 var UsuarioName = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.NombreCompleto ).FirstOrDefaultAsync();
                 var UsuarioFoto = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.ID_ArchivoFoto ).FirstOrDefaultAsync();
                 Archivo ArchiveFound = null;
@@ -44,7 +45,8 @@ namespace POI_2024.Server.Controllers
                     FechaEnvio = Message.FechaEnvio,
                     UsuarioEmisor = UsuarioName,
                     Archivo = ArchiveFound,
-                    UserFoto = Foto
+                    UserFoto = Foto,
+                    Encrypted = Message.Encrypted
                 };
                 ListOfMessages.Add(UsuarioMensajeFound);
             }
