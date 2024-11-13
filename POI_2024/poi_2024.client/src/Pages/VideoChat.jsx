@@ -17,6 +17,7 @@ const VideoChat = () => {
     const localVideoRef = useRef(null);
     const [mic, setMic] = useState(false);
     const [callAcepted, setCallAcepted] = useState(false);
+    const [membersConnectedOfChat, setMembersConnectedOfChat] = useState(null);
     const [incomingCall, setIncomingCall] = useState(false);
     const [callerID, setCallerID] = useState(null);
     const navigate = useNavigate();
@@ -300,6 +301,10 @@ const VideoChat = () => {
         setIncomingCall(false);
         connectionRef.current.invoke("denyCall", callerID);
     }
+
+    const handleUsersConnected = (data) => {
+        setMembersConnectedOfChat(data);
+    }
     return (
         <div className="h-full w-full flex">
             <div className="flex flex-col w-2/3 h-full justify-center">
@@ -326,7 +331,7 @@ const VideoChat = () => {
                 </div>)}
             </div>
             <div className="w-1/3 h-full bg-comp-1">
-                <Chat onMembersConnected={} />
+                <Chat onMembersConnected={handleUsersConnected} />
             </div>
         </div>
     );
