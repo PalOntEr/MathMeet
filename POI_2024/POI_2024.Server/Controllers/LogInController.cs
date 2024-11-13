@@ -47,9 +47,10 @@ namespace POI_2024.Server.Controllers
                 return Unauthorized(new { Message = "Contraseña incorrecta" });
             }
 
+            user.status = 1; 
+            await _context.SaveChangesAsync();
+
             return Ok(user);
-
-
         }
     }
 }
