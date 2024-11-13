@@ -18,7 +18,7 @@ const Chat = (props) => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [message, setMessage] = useState('');
     const [showEmojis, setShowEmojis] = useState(false);
-    const [connection, setConnection] = useState(null);
+    const [currentConnection, setCurrentConnection] = useState(null);
     const { ChatID } = useContext(ChatContext);
     const [msgAttempt, setMsgAttempt] = useState(false);
     const [emote, setEmote] = useState([]);
@@ -28,7 +28,7 @@ const Chat = (props) => {
     const [fileAttempt, setFileAttempt] = useState(false);
     const [idArchive, setIdArchive] = useState(null);
     const secretkey = 'my-very-secure-key-123';
-
+    const [LastChatID, setLastChatID] = useState(ChatID);
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
         if (file) {
@@ -150,6 +150,7 @@ const Chat = (props) => {
                 });
                 setMessages(RestructuredMessage);
             });
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chatHub", {
                 withCredentials: true,
@@ -161,7 +162,7 @@ const Chat = (props) => {
         connection.start()
             .then(async () => {
                 console.log("Connected to SignalR hub");
-                setConnection(connection);
+                setCurrentConnection(connection);
 
                 if (ChatID) {
                     await connection.invoke("JoinChat", ChatID.toString(), user.Matricula);
@@ -171,19 +172,16 @@ const Chat = (props) => {
 
         connection.on("UserConnected", (Matricula) => {
             console.log("This User Is Connected", Matricula);
-            setMembersConnected(prevMembersConnected => [...prevMembersConnected, Matricula]);
+            setMembersConnected(Matricula);
         });
 
         connection.on("UpdateActiveUsers", (activeUsers) => {
             console.log(activeUsers);
-            setMembersConnected(prevMembersConnected => [...prevMembersConnected, activeUsers]);
+            setMembersConnected(activeUsers);
         });
 
         connection.on("UserDisconnected", (Matricula => {
             console.log("Este user se salio gg", Matricula);
-            setMembersConnected(prevMembersConnected =>
-            prevMembersConnected.filter(member => member !== Matricula)
-            );
         }));
 
         connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser, Encrypted) => {
@@ -206,17 +204,17 @@ const Chat = (props) => {
     }, [idArchive]);
 
     const sendEmote = async (ArchiveSent) => {
-        if (connection && !message)
+        if (currentConnection && !message)
             try {
                 setMsgAttempt(true);
-                await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula);
+                await currentConnection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula);
                 setMessage("");
             } catch (err) {
                 console.log("Mamaste: " + err);
             }
     }
     const sendMessageWithFile = async () => {
-        if (connection && (message || file)) {
+        if (currentConnection && (message || file)) {
             try {
                 console.log(file);
                 console.log(idArchive);
@@ -226,10 +224,10 @@ const Chat = (props) => {
                 setMsgAttempt(true);
                 if (user.Encrypt) {
                     const FinalMessage = encryptMessage(message, secretkey);
-                    await connection.invoke('SendMessage', user.UserName, FinalMessage, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
+                    await currentConnection.invoke('SendMessage', user.UserName, FinalMessage, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
                 }
                 else {
-                    await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
+                    await currentConnection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
                 }
                 setMessage("");
                 setFile(null);

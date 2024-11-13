@@ -285,7 +285,7 @@ const Chats = () => {
     return (
         <div id="content-container" className="flex h-screen w-2/3 xs:w-3/4">
             <div id="chat-container" className="flex flex-col justify-between h-full w-3/4 px-2">
-                {members.length <= 2 && (
+                {members.length == 2 && (
                     <div className="h-[10%]">
                         <Link to="/videochat">
                             <VideocamIcon className="bg-primary p-px rounded-full" />
@@ -307,7 +307,6 @@ const Chats = () => {
                         <ul className="bg-color rounded-xl p-3 text-color h-48 text-xs space-y-4 overflow-y-auto flex flex-col">
                             {members && members.map(member => {
                                 const isConnected = membersConnectedOfChat.some(connectedMember => Number(connectedMember) === member.matricula);
-                                console.log(`Member: ${member.matricula}, Connected: ${isConnected}`);
                                 return (
                                     <li key={member.matricula} className="flex items-center space-x-5">
                                         {isConnected ? (
