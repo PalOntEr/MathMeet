@@ -31,12 +31,12 @@ namespace POI_2024.Server.Controllers
              
                 var UsuarioName = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.NombreCompleto ).FirstOrDefaultAsync();
                 var UsuarioFoto = await _context.Usuarios.Where(u=> u.Matricula == Message.UsuarioEmisor).Select(u=> u.ID_ArchivoFoto ).FirstOrDefaultAsync();
-                Archivo ArchiveFound = null;
+                Archivo? ArchiveFound = null;
                 if (Message.ID_Archivo != null)
                 {
                    ArchiveFound = await _context.Archivos.Where(u => u.ID_Archivo == Message.ID_Archivo).FirstOrDefaultAsync();
                 }
-                Archivo Foto = await _context.Archivos.Where(u => u.ID_Archivo == UsuarioFoto).FirstOrDefaultAsync();
+                Archivo? Foto = await _context.Archivos.Where(u => u.ID_Archivo == UsuarioFoto).FirstOrDefaultAsync();
                 
                 var UsuarioMensajeFound = new UsuarioMensaje
                 {
@@ -46,7 +46,8 @@ namespace POI_2024.Server.Controllers
                     UsuarioEmisor = UsuarioName,
                     Archivo = ArchiveFound,
                     UserFoto = Foto,
-                    Encrypted = Message.Encrypted
+                    Encrypted = Message.Encrypted,
+                    Location = Message.Location
                 };
                 ListOfMessages.Add(UsuarioMensajeFound);
             }
