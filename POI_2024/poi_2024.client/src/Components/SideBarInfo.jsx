@@ -188,8 +188,8 @@ function SideBarInfo() {
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
 
-    const handleChatChange = (IDChatSelected) => {
-        ChatSelected(IDChatSelected);
+    const handleChatChange = () => {
+
     }
 
     const handleClick = (usuario) => {
