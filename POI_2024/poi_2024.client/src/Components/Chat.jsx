@@ -185,7 +185,7 @@ const Chat = (props) => {
         connection.start()
             .then(async () => {
                 console.log("Connected to SignalR hub");
-                setCurrentConnection(connection);
+                setConnection(connection);
 
                 if (ChatID) {
                     await connection.invoke("JoinChat", ChatID.toString(), user.Matricula);
@@ -228,7 +228,7 @@ const Chat = (props) => {
     }, [idArchive]);
 
     const sendEmote = async (ArchiveSent) => {
-        if (currentConnection && !message)
+        if (connection && !message)
             try {
                 setMsgAttempt(true);
                 await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula, false, false);
@@ -239,7 +239,7 @@ const Chat = (props) => {
     }
 
     const sendMessageWithFile = async () => {
-        if (currentConnection && (message || file)) {
+        if (connection && (message || file)) {
             try {
                 console.log(file);
                 console.log(idArchive);

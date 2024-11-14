@@ -75,8 +75,8 @@ function SideBar() {
         <div className={"SideBar flex " + SideBarWidth}>
             <div className={'SideBarList flex flex-col items-center ' + SideBarColor + ' ' + SideBar2Width}>
                 <div className="row-User text-primary flex items-center justify-center my-8">
-                    <Dropdown placement="bottomEnd" animation="fade" trigger="hover" icon={<PersonIcon style={{ fontSize: "32px" }} />}>
-                        <div id="User-DropDown" className="font-bold text-comp-1 rounded-xl p-2 flex justify-center flex-col space-y-2 bg-primary">
+                    <Dropdown placement="bottomEnd" animation="fade" trigger="click" icon={<PersonIcon style={{ fontSize: "32px" }} />}>
+                        <div id="User-DropDown" className="font-bold text-comp-1 rounded-xl p-2 flex justify-center flex-col space-y-2 bg-primary absolute z-50">
                             <Dropdown.Item>
                                 <Link to="/ModifyUser">
                                     <p className="text-xs">Modify User</p>
