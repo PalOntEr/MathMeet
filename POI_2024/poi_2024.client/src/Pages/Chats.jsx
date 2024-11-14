@@ -55,6 +55,7 @@ const Chats = () => {
     const [assignmentDescription, setAssignmentDescription] = useState(null);
     const [assignmentDue, setAssignmentDue] = useState(null);
     const [assignmentReward, setAssignmentReward] = useState(null);
+    const [usersChanged, setUsersChanged] = useState(true);
 
     const openModal = () => setModalOpen(true);
     const closeModal = () => {
@@ -107,6 +108,32 @@ const Chats = () => {
         setIdFiletoDownload(Number(e.currentTarget.id));
         setDownloadAttempt(true);
     };
+
+    const handleBeforeUnload = () => {
+        // This function sends an update request
+        fetch('usuarios', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                matricula: user.Matricula,
+                status: 0
+            }), // Replace with your API details
+            keepalive: true, // Ensures the request completes even if the page is closing
+        });
+    };
+
+    useEffect(() => {
+        // Attach the event listener
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        // Clean up by removing the event listener when the component unmounts
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
 
     useEffect(() => {
         if (!ChatID) return;
@@ -227,7 +254,7 @@ const Chats = () => {
                     setUserAdmin(false);
                 }
             }).catch(error => { console.log(error) });
-    }, [ChatID]);
+    }, [ChatID, membersConnectedOfChat, user.Matricula]);
 
     useEffect(() => {
         if (!ChatID) return;
@@ -307,10 +334,14 @@ const Chats = () => {
                         <ul className="bg-color rounded-xl p-3 text-color h-48 text-xs space-y-4 overflow-y-auto flex flex-col">
                             {members && members.map(member => {
                                 const isConnected = membersConnectedOfChat.some(connectedMember => Number(connectedMember) === member.matricula);
+                                const isOnline = member.active;
+
                                 return (
                                     <li key={member.matricula} className="flex items-center space-x-5">
                                         {isConnected ? (
                                             <div className="bg-secondary w-2 h-1/2 rounded-full"></div>
+                                        ) : isOnline === 1 ? (
+                                            <div className="bg-primary w-2 h-1/2 rounded-full"></div>
                                         ) : (
                                             <div className="bg-red-900 w-2 h-1/2 rounded-full"></div>
                                         )}

@@ -169,6 +169,7 @@ const Chat = (props) => {
                 }
             })
             .catch(err => console.error("SignalR connection error: ", err));
+        connection.invoke("LeaveChat", "1", user.Matricula);
 
         connection.on("UserConnected", (Matricula) => {
             console.log("This User Is Connected", Matricula);
@@ -180,9 +181,9 @@ const Chat = (props) => {
             setMembersConnected(activeUsers);
         });
 
-        connection.on("UserDisconnected", (Matricula => {
+        connection.on("UserDisconnected", (Matricula) => {
             console.log("Este user se salio gg", Matricula);
-        }));
+        });
 
         connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser, Encrypted) => {
             if (Encrypted) {
