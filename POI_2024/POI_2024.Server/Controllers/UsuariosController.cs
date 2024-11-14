@@ -63,7 +63,7 @@ namespace POI_2024.Server.Controllers
                 UsuarioFound.Contrasena = UsuarioToUpdate.Contrasena;
             }
 
-            if (UsuarioToUpdate.ID_ArchivoFoto != 0)
+            if (UsuarioToUpdate.ID_ArchivoFoto != null)
             {
                 UsuarioFound.ID_ArchivoFoto = UsuarioToUpdate.ID_ArchivoFoto;
             }

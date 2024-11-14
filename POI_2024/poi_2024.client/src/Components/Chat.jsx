@@ -173,6 +173,7 @@ const Chat = (props) => {
                 });
                 setMessages(RestructuredMessage);
             });
+
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/chatHub", {
                 withCredentials: true,
@@ -184,30 +185,28 @@ const Chat = (props) => {
         connection.start()
             .then(async () => {
                 console.log("Connected to SignalR hub");
-                setConnection(connection);
+                setCurrentConnection(connection);
 
                 if (ChatID) {
                     await connection.invoke("JoinChat", ChatID.toString(), user.Matricula);
                 }
             })
             .catch(err => console.error("SignalR connection error: ", err));
+        connection.invoke("LeaveChat", "1", user.Matricula);
 
         connection.on("UserConnected", (Matricula) => {
             console.log("This User Is Connected", Matricula);
-            setMembersConnected(prevMembersConnected => [...prevMembersConnected, Matricula]);
+            setMembersConnected(Matricula);
         });
 
         connection.on("UpdateActiveUsers", (activeUsers) => {
             console.log(activeUsers);
-            setMembersConnected(prevMembersConnected => [...prevMembersConnected, activeUsers]);
+            setMembersConnected(activeUsers);
         });
 
-        connection.on("UserDisconnected", (Matricula => {
+        connection.on("UserDisconnected", (Matricula) => {
             console.log("Este user se salio gg", Matricula);
-            setMembersConnected(prevMembersConnected =>
-                prevMembersConnected.filter(member => member !== Matricula)
-            );
-        }));
+        });
 
         connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser, Encrypted, location) => {
             if (Encrypted) {
@@ -229,7 +228,7 @@ const Chat = (props) => {
     }, [idArchive]);
 
     const sendEmote = async (ArchiveSent) => {
-        if (connection && !message)
+        if (currentConnection && !message)
             try {
                 setMsgAttempt(true);
                 await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula, false, false);
@@ -240,7 +239,7 @@ const Chat = (props) => {
     }
 
     const sendMessageWithFile = async () => {
-        if (connection && (message || file)) {
+        if (currentConnection && (message || file)) {
             try {
                 console.log(file);
                 console.log(idArchive);

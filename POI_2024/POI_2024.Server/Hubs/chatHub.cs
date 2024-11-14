@@ -2,6 +2,7 @@
 using POI_2024.Server.DBContext;
 using Microsoft.EntityFrameworkCore;
 using POI_2024.Server.Models;
+using System;
 
 
 namespace POI_2024.Server.Hubs
@@ -18,68 +19,71 @@ namespace POI_2024.Server.Hubs
         }
         public async Task JoinChat(string ChatID, int Matricula)
         {
-            ConnectedUsers[Matricula.ToString()] = (Matricula,ChatID);
+            ConnectedUsers[Context.ConnectionId] = (Matricula,ChatID);
 
             var activeUsers = ConnectedUsers
-                .Where(pair => pair.Value == (Matricula, ChatID))
-                .Select(pair => pair.Key)
+                .Where(pair => pair.Value.ChatID == ChatID)
+                .Select(pair => pair.Value.Matricula   )
                 .ToList();
 
             await Groups.AddToGroupAsync(Context.ConnectionId, ChatID);
-            await Clients.Group(ChatID).SendAsync("UpdateActiveUsers", activeUsers);
 
+            Console.WriteLine("USUARIO QUE SE CONECTO: " + Matricula);
+            Console.WriteLine("CHAT AL QUE SE CONECTO: " +  ChatID);
+            foreach (var kvp in ConnectedUsers)
+            {
+                Console.WriteLine($"Key: {kvp.Key}, Value: {kvp.Value}");
+            }
+
+            foreach (var user in activeUsers)
+            {
+                Console.WriteLine($"User: {user}");
+            }
+            await Clients.Group(ChatID).SendAsync("UpdateActiveUsers", activeUsers);
         }
 
         public async Task LeaveChat(string ChatID, int Matricula)
         {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, ChatID);
+            Console.WriteLine("TOP 5 HIJOS DE SU PUTA MADRE CAPTADOS EN CAMARA " + Matricula);
             await Clients.Group(ChatID).SendAsync("UserDisconnected", Matricula);
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            if (ConnectedUsers.TryGetValue(Context.ConnectionId, out var userInfo))
-            {   
-                // Remove user from the dictionary
-                ConnectedUsers.Remove(Context.ConnectionId);
+            // Retrieve the ConnectionId of the user disconnecting
+            string connectionId = Context.ConnectionId;
 
-                // Notify clients about the updated active users
+            // Check if the user exists in the ConnectedUsers dictionary
+            if (ConnectedUsers.ContainsKey(connectionId))
+            {
+                // Retrieve user data before removing
+                var userData = ConnectedUsers[connectionId];
+                string chatId = userData.ChatID;
+                int matricula = userData.Matricula;
+
+                // Remove the user from the ConnectedUsers dictionary
+                ConnectedUsers.Remove(connectionId);
+
+                // Optionally remove the user from the SignalR group if needed
+                await Groups.RemoveFromGroupAsync(connectionId, chatId);
+
+                // Log for debugging purposes (optional)
+                Console.WriteLine($"User with Matricula: {matricula} disconnected from ChatID: {chatId}");
+
+                // Update the active users for the specific chat
                 var activeUsers = ConnectedUsers
-                    .Where(pair => pair.Value.ChatID == userInfo.ChatID)
+                    .Where(pair => pair.Value.ChatID == chatId)
                     .Select(pair => pair.Value.Matricula)
                     .ToList();
 
-                await Clients.Group(userInfo.ChatID).SendAsync("UpdateActiveUsers", activeUsers);
-                await Clients.Group(userInfo.ChatID).SendAsync("UserDisconnected", activeUsers);
+                // Send the updated list of active users to all clients in the chat
+                await Clients.Group(chatId).SendAsync("UpdateActiveUsers", activeUsers);
             }
 
+            // Call the base method
             await base.OnDisconnectedAsync(exception);
         }
-        public override async Task OnConnectedAsync()
-        {
-            // Retrieve user information from the context or query parameters
-            string? matricula = Context.GetHttpContext()?.Request.Query["Matricula"];
-            string? chatID = Context.GetHttpContext()?.Request.Query["ChatID"];
-            // Ensure the matricula and chatId values are valid (optional: add further validation)
-            if (!string.IsNullOrEmpty(matricula) && !string.IsNullOrEmpty(chatID))
-            {
-                // Add or update the ConnectedUsers dictionary with the new connection
-                ConnectedUsers[Context.ConnectionId] = (Int32.Parse(matricula), chatID);
-
-                // Add the user to the appropriate SignalR group
-                await Groups.AddToGroupAsync(Context.ConnectionId, chatID);
-
-                // Optionally notify clients about the new connection
-                List<int> activeUsers = ConnectedUsers
-                    .Where(pair => pair.Value.ChatID == chatID)
-                    .Select(pair => pair.Value.Matricula)
-                    .ToList();
-
-                await Clients.Group(chatID).SendAsync("UpdateActiveUsers", activeUsers);
-            }
-
-            await base.OnConnectedAsync();
-        }
+        
         public async Task SendMessage(string user, string message,int? IDArchive, string ChatID, int UserID, bool? Encrypted, bool? Location)
         {
 

@@ -94,13 +94,15 @@ namespace POI_2024.Server.Controllers
             {
                 var Username = await _context.Usuarios.Where(u => u.Matricula == IDUser.Integrante).Select(
                     u => new { u.NombreCompleto,
-                        u.Matricula }
+                        u.Matricula,
+                    u.status}
                 ).FirstOrDefaultAsync();
 
                 var UserSelected = new UserSelected
                 {
                     Nombre = Username.NombreCompleto,
-                    Matricula = Username.Matricula
+                    Matricula = Username.Matricula,
+                    Active = Username.status
                 };
 
                 ListOfUsersFound.Add(UserSelected);

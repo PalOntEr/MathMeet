@@ -1,39 +1,76 @@
 import './SideBar.css'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SideBarData } from './SideBarData'
 import PersonIcon from '@mui/icons-material/Person';
 import { Link } from 'react-router-dom';
 import SideBarInfo from './SideBarInfo.jsx'
 import Dropdown from 'rsuite/Dropdown';
 import 'react-dropdown/style.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function SideBar() {
     const location = useLocation();
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const locationpaths = "/ModifyUser";
+    const navigate = useNavigate();
     const locationpaths2 = "/videochat";
+    const [logOutAtt, setLogOutAtt] = useState(false);
+
     var SideBarWidth;
     var SideBar2Width;
     var SideBarColor;
 
-    if(location.pathname === locationpaths2)
-    {
+    if (location.pathname === locationpaths2) {
         SideBarWidth = '';
         SideBar2Width = 'w-full';
         SideBarColor = 'bg-comp-1';
     }
-    else{
-        if(location.pathname === locationpaths)
-        {
+    else {
+        if (location.pathname === locationpaths) {
             SideBarWidth = 'w-1/2';
         }
-        else{
-            SideBarWidth= 'w-1/4 md:w-1/3';
+        else {
+            SideBarWidth = 'w-1/4 md:w-1/3';
         }
         SideBarColor = '';
         SideBar2Width = 'w-16'
     }
 
+    useEffect(() => {
+        if (!logOutAtt) return;
+
+        const LogOutUpdate = async () => {
+            try {
+                const response = await fetch("usuarios", {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        matricula: user.Matricula,
+                        status: 0,
+                        calCoins: 0
+                    }),
+                });
+
+                const data = response.text();
+
+                if (!response.ok) {
+                    throw new Error("Hubo un error gg");
+                }
+                console.log(data);
+                navigate("/");
+            } catch (error) {
+                console.error("Hubo un error en algun lado gg", error);
+            }
+            }
+
+        LogOutUpdate();
+            localStorage.setItem("user", null);
+        });
+    const handleLogOut = () => {
+        setLogOutAtt(true);
+    };
     return (
         <div className={"SideBar flex " + SideBarWidth}>
             <div className={'SideBarList flex flex-col items-center ' + SideBarColor + ' ' + SideBar2Width}>
@@ -46,9 +83,7 @@ function SideBar() {
                                 </Link>
                             </Dropdown.Item>
                             <Dropdown.Item>
-                                <Link to="/">
-                                    <p className="text-xs">Log Out</p>
-                                </Link>
+                                <p className="text-xs" onClick={handleLogOut}>Log Out</p>
                             </Dropdown.Item>
                         </div>
                     </Dropdown>
@@ -70,7 +105,7 @@ function SideBar() {
                 </ul>
 
             </div>
-            <SideBarInfo/>
+            <SideBarInfo />
         </div>
     );
 }

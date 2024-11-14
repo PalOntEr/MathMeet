@@ -15,6 +15,8 @@
     {
         public int Matricula { set; get; }
         public string Nombre { set; get; }
+
+        public int? Active { set; get; }
     }   
     public class UserLoginRequest
     {
