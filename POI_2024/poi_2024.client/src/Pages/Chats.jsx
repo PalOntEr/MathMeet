@@ -254,7 +254,7 @@ const Chats = () => {
                     setUserAdmin(false);
                 }
             }).catch(error => { console.log(error) });
-    }, [ChatID, membersConnectedOfChat, user.Matricula]);
+    }, [ChatID]);
 
     useEffect(() => {
         if (!ChatID) return;
