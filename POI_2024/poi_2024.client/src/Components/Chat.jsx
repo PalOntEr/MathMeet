@@ -8,6 +8,7 @@ import OutgoingMessage from '../Components/OutgoingMessage.jsx';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
+import AddLocationIcon from '@mui/icons-material/AddLocationAlt';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Emotes from '../Components/Emotes.jsx';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -18,7 +19,7 @@ const Chat = (props) => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [message, setMessage] = useState('');
     const [showEmojis, setShowEmojis] = useState(false);
-    const [currentConnection, setCurrentConnection] = useState(null);
+    const [connection, setConnection] = useState(null);
     const { ChatID } = useContext(ChatContext);
     const [msgAttempt, setMsgAttempt] = useState(false);
     const [emote, setEmote] = useState([]);
@@ -28,7 +29,8 @@ const Chat = (props) => {
     const [fileAttempt, setFileAttempt] = useState(false);
     const [idArchive, setIdArchive] = useState(null);
     const secretkey = 'my-very-secure-key-123';
-    const [LastChatID, setLastChatID] = useState(ChatID);
+    const [location, setLocation] = useState(false);
+
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
         if (file) {
@@ -40,6 +42,24 @@ const Chat = (props) => {
         fileInputRef.current.click();
     }
 
+    const handleLocationClick = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    console.log("Latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude);
+                },
+                (error) => {
+                    console.error("Error obtaining location: ", error);
+                }
+            );
+
+            sendLocation();
+
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+        }
+    }
+
     useEffect(() => {
         if (!msgAttempt) return;
 
@@ -48,7 +68,8 @@ const Chat = (props) => {
             chatReceptor: ChatID,
             mensaje: message,
             ID_Archivo: emote.EmoteID ? emote.EmoteID : idArchive,
-            Encrypted: user.Encrypt
+            Encrypted: user.Encrypt,
+            Location: location
         };
 
         const RegisterMessage = async () => {
@@ -70,14 +91,15 @@ const Chat = (props) => {
                 setFile(null);
                 setIdArchive(null);
                 console.log('Mensaje registrado con éxito:', data);
-                //alert("Usuario registrado con éxito");
             } catch (error) {
-                console.error('Error al registrar el usuario:', error);
-                //alert("Hubo un error al registrar el usuario");
+                console.error('Error al registrar el mensaje:', error);
             }
         }
         RegisterMessage();
         setMsgAttempt(false);
+        setMessage("");
+        setLocation(false);
+        setFile(null);
     }, [msgAttempt, emote]);
 
     useEffect(() => {
@@ -145,7 +167,8 @@ const Chat = (props) => {
                         type: item.usuarioEmisor === user.UserName ? "outcoming" : "incoming",
                         DateSent: item.fechaEnvio,
                         Archive: item.archivo,
-                        userFoto: item.userFoto
+                        userFoto: item.userFoto,
+                        Location: item.location
                     })
                 });
                 setMessages(RestructuredMessage);
@@ -185,12 +208,12 @@ const Chat = (props) => {
             console.log("Este user se salio gg", Matricula);
         });
 
-        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser, Encrypted) => {
+        connection.on("ReceiveMessage", (sender, receivedMessage, ArchiveSent, DateOfSent, FotoUser, Encrypted, location) => {
             if (Encrypted) {
                 receivedMessage = decryptMessage(receivedMessage, secretkey);
             }
             console.log(ArchiveSent);
-            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent, userFoto: FotoUser }]);
+            setMessages(prevMessages => [...prevMessages, { DateSent: DateOfSent, message: receivedMessage, sender, type: sender === user.UserName ? "outcoming" : "incoming", Archive: ArchiveSent, userFoto: FotoUser, Location: location }]);
         });
 
         return () => {
@@ -208,12 +231,13 @@ const Chat = (props) => {
         if (currentConnection && !message)
             try {
                 setMsgAttempt(true);
-                await currentConnection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula);
+                await connection.invoke('SendMessage', user.UserName, message, ArchiveSent.EmoteID, ChatID.toString(), user.Matricula, false, false);
                 setMessage("");
             } catch (err) {
                 console.log("Mamaste: " + err);
             }
     }
+
     const sendMessageWithFile = async () => {
         if (currentConnection && (message || file)) {
             try {
@@ -222,21 +246,24 @@ const Chat = (props) => {
                 if (user.Encrypt) {
                     setMessage(encryptMessage(message, secretkey));
                 }
+                await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula, user.Encrypt, false);
                 setMsgAttempt(true);
-                if (user.Encrypt) {
-                    const FinalMessage = encryptMessage(message, secretkey);
-                    await currentConnection.invoke('SendMessage', user.UserName, FinalMessage, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
-                }
-                else {
-                    await currentConnection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula, user.Encrypt);
-                }
-                setMessage("");
-                setFile(null);
             } catch (err) {
                 console.log("Mamaste: " + err);
             }
         }
     };
+
+    const sendLocation = async () => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            setMessage(`https://www.google.com/maps/@${latitude},${longitude},15z`);
+            setLocation(true);
+            setMsgAttempt(true);
+            connection.invoke('SendLocation', user.UserName, `https://www.google.com/maps/@${latitude},${longitude},15z`, ChatID.toString(), user.Matricula);
+        });
+    }
 
     const sendMessage = async () => {
         if (file) {
@@ -276,11 +303,11 @@ const Chat = (props) => {
 
     return (
         <div className="flex flex-col w-full h-full overflow-y-scroll">
-            <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll">
+            <div id="Messages-Container" className="flex flex-col w-full h-full overflow-y-scroll overflow-x-hidden">
                 {messages && messages.map((msg, index) => (
                     msg.type === "incoming" ?
-                        (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />) :
-                        (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} />)
+                        (<IncomingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} location={ msg.Location } />) :
+                        (<OutgoingMessage key={index} message={msg.message} sender={msg.sender} DateSent={msg.DateSent} Archive={msg.Archive} userFoto={msg.userFoto} location={ msg.Location } />)
                 ))}
             </div>
             {file && (
@@ -296,6 +323,9 @@ const Chat = (props) => {
                 <div id="btn-container" className="">
                     <input type="file" className="hidden" ref={fileInputRef} onChange={handleFileChange}></input>
                     <button id="AddFile"><AddIcon className="text-primary" onClick={handleFileClick} /></button>
+                </div>
+                <div id="btn-container" className="">
+                    <button id="SendLocation"><AddLocationIcon className="text-primary" onClick={handleLocationClick} /></button>
                 </div>
                 <div className='btn-container'>
                     <button onClick={() => { setShowEmojis(!showEmojis) }} id="Emojis"><EmojiEmotionsIcon className="Icon-container text-primary" /></button>

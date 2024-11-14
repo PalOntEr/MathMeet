@@ -83,8 +83,8 @@ namespace POI_2024.Server.Hubs
             // Call the base method
             await base.OnDisconnectedAsync(exception);
         }
-
-        public async Task SendMessage(string user, string message,int? IDArchive, string ChatID, int UserID, bool? Encrypted)
+        
+        public async Task SendMessage(string user, string message,int? IDArchive, string ChatID, int UserID, bool? Encrypted, bool? Location)
         {
 
             var UserFound = await _context.Usuarios.Where(u => u.Matricula == UserID).Select(u => u.ID_ArchivoFoto).FirstOrDefaultAsync();
@@ -92,12 +92,19 @@ namespace POI_2024.Server.Hubs
             if (IDArchive != null)
             {
                 var ArchiveFound = await _context.Archivos.Where(u => u.ID_Archivo == IDArchive).FirstOrDefaultAsync();
-                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, ArchiveFound, DateTime.Now,FotoFound, Encrypted);
+                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, ArchiveFound, DateTime.Now, FotoFound, Encrypted, Location);
             }
             else
             {
-                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, null, DateTime.Now,FotoFound, Encrypted);
+                await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, null, DateTime.Now, FotoFound, Encrypted, Location);
             }
+        }
+
+        public async Task SendLocation(string user, string message, string ChatID, int UserID)
+        {
+            var UserFound = await _context.Usuarios.Where(u => u.Matricula == UserID).Select(u => u.ID_ArchivoFoto).FirstOrDefaultAsync();
+            var FotoFound = await _context.Archivos.Where(u => u.ID_Archivo == UserFound).FirstOrDefaultAsync();
+            await Clients.Group(ChatID).SendAsync("ReceiveMessage", user, message, null, DateTime.Now, FotoFound, false, true);
         }
     }
 }
