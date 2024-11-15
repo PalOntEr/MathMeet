@@ -3,6 +3,7 @@ import './Chat.css'
 import { useContext,useEffect, useState } from 'react';
 import { ChatContext } from '../ChatContext';
 import { UserContext } from '../UserContext';
+import * as signalR from '@microsoft/signalr';
 import GroupImg from '../Images/DAMN.png'
 import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
@@ -41,6 +42,7 @@ const Chats = () => {
     const [membersAdded, setMembersAdded] = useState([]);
     const [memberstoAdd, setMemberstoAdd] = useState([]);
     const [membersConnectedOfChat, setMembersConnectedOfChat] = useState(null);
+    const [membersConnectedInPage, setMembersConnectedInPage] = useState([]);
     const [ChatName, setChatName] = useState();
     const [archives, setArchives] = useState(null);
     const [downloadAttempt, setDownloadAttempt] = useState(false);
@@ -55,8 +57,7 @@ const Chats = () => {
     const [assignmentDescription, setAssignmentDescription] = useState(null);
     const [assignmentDue, setAssignmentDue] = useState(null);
     const [assignmentReward, setAssignmentReward] = useState(null);
-    const [usersChanged, setUsersChanged] = useState(true);
-
+    const [connection, setConnection] = useState(null);
     const openModal = () => setModalOpen(true);
     const closeModal = () => {
         setModalOpen(false);
@@ -76,6 +77,13 @@ const Chats = () => {
     const RemoveMemberAdded = (memberSelected) => {
         setMembersAdded(prevState => prevState.filter(usuario => usuario.matricula !== memberSelected.matricula));
     }
+
+    useEffect(() => {
+        if ((ChatID == null || ChatID  == 0) && connection) {
+            connection.invoke("LeavePage", user.Matricula);
+        }
+    }, [ChatID]);
+
     useEffect(() => {
         if (!downloadAttempt) return;
         console.log(idFiletoDownload);
@@ -108,32 +116,6 @@ const Chats = () => {
         setIdFiletoDownload(Number(e.currentTarget.id));
         setDownloadAttempt(true);
     };
-
-    const handleBeforeUnload = () => {
-        // This function sends an update request
-        fetch('usuarios', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                matricula: user.Matricula,
-                status: 0
-            }), // Replace with your API details
-            keepalive: true, // Ensures the request completes even if the page is closing
-        });
-    };
-
-    useEffect(() => {
-        // Attach the event listener
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        // Clean up by removing the event listener when the component unmounts
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, []);
-
 
     useEffect(() => {
         if (!ChatID) return;
@@ -226,6 +208,8 @@ const Chats = () => {
                 }
 
                 console.log('Usuarios Agregados con éxito:', data);
+                alert("Usuarios Agregados con exito");
+                location.reload();
                 closeModal();
             } catch (error) {
                 console.error('Error al Agregar Usuarios:', error);
@@ -257,6 +241,47 @@ const Chats = () => {
     }, [ChatID]);
 
     useEffect(() => {
+        // Logic to update UI based on membersConnectedOfChat changes
+        // This could include updating state or performing a render action
+        console.log("Members connected changed:", membersConnectedOfChat);
+    }, [membersConnectedOfChat]);
+
+    useEffect(() => {
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/GlobalHub", {
+                withCredentials: true,
+            })
+            .withAutomaticReconnect()
+            .build();
+
+        connection.start()
+            .then(async () => {
+                console.log("Connected to Global SignalR hub");
+                setConnection(connection);
+              await connection.invoke("JoinPage", user.Matricula);
+            })
+            .catch(err => console.error("SignalR connection error: ", err));
+
+        connection.on("UserConnected", (Matricula) => {
+            console.log("This user is connected to the server: ", Matricula);
+            setMembersConnectedInPage(prevMembersConnectedInPage => [...prevMembersConnectedInPage, Matricula]);
+        });
+
+        connection.on("UpdateUsers", (ActiveUsers) => {
+            console.log("These are the active Users", ActiveUsers);
+            setMembersConnectedInPage(ActiveUsers);
+        });
+
+        connection.on("UserDisconnected", (Matricula) => {
+            console.log("This user is disconnected to the server: ", Matricula);
+            setMembersConnectedInPage(prevMembersConnectedInPage =>
+                prevMembersConnectedInPage.filter(member => member !== Matricula)
+            );
+        });
+    }, []);
+
+    useEffect(() => {
         if (!ChatID) return;
         setAssignments([]);
         fetch("Tareas/" + ChatID).
@@ -280,7 +305,6 @@ const Chats = () => {
 
     useEffect(() => {
         setMembersConnectedOfChat([]);
-        console.log("Cambiaste de chat gg")
     }, [ChatID]);
 
     const handleClick = (usuario) => {
@@ -334,13 +358,12 @@ const Chats = () => {
                         <ul className="bg-color rounded-xl p-3 text-color h-48 text-xs space-y-4 overflow-y-auto flex flex-col">
                             {members && members.map(member => {
                                 const isConnected = membersConnectedOfChat.some(connectedMember => Number(connectedMember) === member.matricula);
-                                const isOnline = member.active;
-
+                                const isInPage = membersConnectedInPage.some(connectedMember => Number(connectedMember) === member.matricula);
                                 return (
                                     <li key={member.matricula} className="flex items-center space-x-5">
                                         {isConnected ? (
                                             <div className="bg-secondary w-2 h-1/2 rounded-full"></div>
-                                        ) : isOnline === 1 ? (
+                                        ) : isInPage ? (
                                             <div className="bg-primary w-2 h-1/2 rounded-full"></div>
                                         ) : (
                                             <div className="bg-red-900 w-2 h-1/2 rounded-full"></div>

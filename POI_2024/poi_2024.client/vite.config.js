@@ -94,7 +94,17 @@ export default defineConfig({
                 target,
                 secure: false
             },
+            '^/Premios': {
+                target,
+                secure: false
+            },
             '^/VideochatHub': {
+                target,
+                changeOrigin: true,
+                ws: true,
+                secure: false
+            },
+            '^/GlobalHub': {
                 target,
                 changeOrigin: true,
                 ws: true,
