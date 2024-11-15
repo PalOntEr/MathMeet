@@ -192,7 +192,6 @@ const Chat = (props) => {
                 }
             })
             .catch(err => console.error("SignalR connection error: ", err));
-        connection.invoke("LeaveChat", "1", user.Matricula);
 
         connection.on("UserConnected", (Matricula) => {
             console.log("This User Is Connected", Matricula);
@@ -243,10 +242,12 @@ const Chat = (props) => {
             try {
                 console.log(file);
                 console.log(idArchive);
+                let FinalMessage = message;
                 if (user.Encrypt) {
-                    setMessage(encryptMessage(message, secretkey));
+                    FinalMessage = encryptMessage(message, secretkey);
+                    setMessage(FinalMessage);
                 }
-                await connection.invoke('SendMessage', user.UserName, message, idArchive, ChatID.toString(), user.Matricula, user.Encrypt, false);
+                await connection.invoke('SendMessage', user.UserName, FinalMessage, idArchive, ChatID.toString(), user.Matricula, user.Encrypt, false);
                 setMsgAttempt(true);
             } catch (err) {
                 console.log("Mamaste: " + err);
