@@ -26,5 +26,24 @@ namespace POI_2024.Server.Controllers
             var EmotesFound = await _context.Archivos.Where(a => emoteIDs.Contains(a.ID_Archivo)).ToListAsync();
             return Ok(EmotesFound);
         }
+
+        [HttpPost]
+
+        public async Task<ActionResult> RegisterPurchase([FromBody]UsuariosPremios PremioToRegister)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _context.UsuariosPremios.AddAsync(PremioToRegister);
+            var UsuarioFound = await _context.Usuarios.Where(u => u.Matricula == PremioToRegister.Matricula).FirstOrDefaultAsync();
+            var Premio = await _context.Premios.Where(u => u.ID_Premio == PremioToRegister.ID_Premio).Select(u => u.Costo).FirstOrDefaultAsync();
+            UsuarioFound.CalCoins -= Premio;
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
