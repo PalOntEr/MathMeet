@@ -48,7 +48,8 @@ const LogIn = () => {
                     UserName: data.nombreCompleto,
                     Encrypt: data.encrypt,
                     NombreCompleto: data.nombreCompleto,
-                    Active: data.status
+                    Active: data.status,
+                    calCoins: data.calCoins
                 });
                 navigate('/Chats')//si todo sale bien re redirecciona a la pagina de chats
 
