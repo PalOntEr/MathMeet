@@ -118,7 +118,7 @@ namespace POI_2024.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Chats>>> GetChats(int UserLoggedIn)
+        public async Task<ActionResult<IEnumerable<ChatsWithImage>>> GetChats(int UserLoggedIn)
         {
             var ID_ChatsFound = await _context.ChatsUsuarios.Where(u =>
             u.Integrante == UserLoggedIn).Select(u => new
@@ -128,14 +128,47 @@ namespace POI_2024.Server.Controllers
 
             var ChatIDS = ID_ChatsFound.Select(c => c.ID_Chat).ToList();
 
-            var ChatsFound = await _context.Chats.Where(u => ChatIDS.Contains(u.ID_Chat)).Select(
+            var ChatsInfoFound = await _context.Chats.Where(u => ChatIDS.Contains(u.ID_Chat)).Select(
                 u => new
                 {
                     u.Nombre,
-                    u.ID_Chat
+                    u.ID_Chat,
+                    u.ID_ArchivoFoto
                 }).ToListAsync();
 
+            List<ChatsWithImage> ChatsFound = new List<ChatsWithImage>();
+            foreach(var ChatFound in ChatsInfoFound)
+            {
+                Byte[]? FotoOfChat = await _context.Archivos.Where(u => u.ID_Archivo == ChatFound.ID_ArchivoFoto).Select(u => u.Contenido).FirstOrDefaultAsync();
+                ChatsFound.Add(new ChatsWithImage
+                {
+                    ID_Chat = ChatFound.ID_Chat,
+                    Nombre = ChatFound.Nombre,
+                    Foto = FotoOfChat
+                });
+            }
             return Ok(ChatsFound);
+        }
+
+        [HttpPut("{ChatID}")]
+
+        public async Task<ActionResult> UpdatePhoto(int ChatID, [FromBody] int Photo)
+        {
+            if (Photo <= 0)
+            {
+                return BadRequest(ModelState);
+            }
+          
+            var ChatFound = await _context.Chats.Where(u=> u.ID_Chat == ChatID).FirstOrDefaultAsync();
+
+            if (ChatFound == null)
+            {
+                return NotFound();
+            }
+            ChatFound.ID_ArchivoFoto = Photo;
+
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }
