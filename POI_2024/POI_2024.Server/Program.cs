@@ -65,6 +65,7 @@ app.UseCors("AllowSpecificOrigin");
 app.MapControllers();
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<VideoChatHub>("/VideochatHub");
+app.MapHub<GlobalHub>("/GlobalHub");
 app.MapFallbackToFile("/index.html");
 
 app.Run();
