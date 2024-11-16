@@ -35,7 +35,8 @@ function SideBarInfo() {
     const [updateUserAtt, setUpdateUserAtt] = useState(false);
     const [usuarioBuscado, setUsuarioBuscado] = useState(null);
     const [ChatsFound, setChatsFound] = useState([]);
-
+    const [newPassword, setNewPassword] = useState(null);
+    const [confirmNewPassword, setConfirmNewPassword] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [newNombreCompleto, setNewNombreCompleto] = useState(user.NombreCompleto);
     const [newEncrypt, setNewEncrypt] = useState(user.Encrypt);
@@ -55,15 +56,31 @@ function SideBarInfo() {
         if (pagina.pathname === '/Assignments') {
             fetch("UsersTareas/" + user.Matricula + "," + false).
                 then(response => response.json()).
-                then(data => setAssignments(data))
+                then(data => {
+                     const filteredAssignments = data.filter(assignment => {
+                    const assignmentDate = new Date(assignment.fechaFinalizacion);
+                    const today = new Date();
+
+                    // Strip the time from both dates for comparison
+                    return assignmentDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0);
+                });
+
+                setAssignments(filteredAssignments);
+                })
                 .catch(error => console.log(error));
         }
         else {
             fetch("UsersTareas/" + user.Matricula + "," + true).
                 then(response => response.json()).
-                then(data => {
-                    setAssignments(data);
-                    console.log(data);
+                then(data => { const filteredAssignments = data.filter(assignment => {
+                    const assignmentDate = new Date(assignment.fechaFinalizacion);
+                    const today = new Date();
+
+                    // Strip the time from both dates for comparison
+                    return assignmentDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0);
+                });
+
+                setAssignments(filteredAssignments);
                 })
                 .catch(error => console.log(error));
         }
@@ -134,7 +151,7 @@ function SideBarInfo() {
             catch(error => {
                 console.error(error);
             });
-    }, [user.Matricula]);
+    }, [ChatID]);
 
     useEffect(() => {
         if (!updateUserAtt) return;
@@ -145,10 +162,14 @@ function SideBarInfo() {
             nombreCompleto: newNombreCompleto,
             encrypt: newEncrypt,
             calCoins: 0,
-            iD_ArchivoFoto: 0
+            contrasena: newPassword
         };
 
         const UpdateUser = async () => {
+            if (!(newPassword == confirmNewPassword)) {
+                alert("La nueva contraseña no coincide");
+                return
+            };
             try {
                 const response = await fetch('usuarios', {
                     method: 'PUT',
@@ -166,13 +187,12 @@ function SideBarInfo() {
                 }
 
                 console.log(data);
-                const matricula = user.Matricula;
-                LoginUsuario({
-                    Matricula: matricula,
-                    UserName: newNombreCompleto,
-                    Encrypt: newEncrypt,
-                    NombreCompleto: newNombreCompleto
-                });
+                let UserToUpdate = JSON.parse(localStorage.getItem("user"));
+                UserToUpdate.NombreCompleto = newNombreCompleto;
+                UserToUpdate.UserName = newNombreCompleto;
+                UserToUpdate.Encrypt = newEncrypt;
+                localStorage.setItem("user", JSON.stringify(UserToUpdate));
+                location.reload();
 
             } catch (error) {
                 console.error("Hubo un error gg", error);
@@ -217,14 +237,13 @@ function SideBarInfo() {
                     {ChatsFound.map(ChatFound => (
                         <li key={ChatFound.iD_Chat} onClick={() => { ChatSelected(ChatFound.iD_Chat) }} value={ChatFound.iD_Chat} className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
                             <div id={ChatFound.iD_Chat == ChatID ? "activeChat" : ""} className="flex flex-row w-full text-color px-2 py-3">
-                                <img src={GroupImg} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
+                                    <img src={"data:image/*;base64," + ChatFound.foto} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
                                 <div className="w-full justify-center flex flex-col">
-                                    <h1 id="GroupName" className="text-xl xs:text-3xl font-bold flex justify-between">{ChatFound.nombre}<span className="text-xs xs:text-sm font-bold text-background">9:54 AM</span></h1>
-                                    <p id="LastMessageSent" className="text-xs xs:text-sm">Ultimo Mensaje Enviado</p>
+                                    <h1 id="GroupName" className="text-xl xs:text-3xl font-bold flex justify-between">{ChatFound.nombre}</h1>
                                 </div>
                             </div>
                         </li>
-                    ))}
+                        ))}
                 </ul>
                 <button onClick={openModal} id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
                 <Modal show={ModalOpen} handleClose={closeModal}>
@@ -274,11 +293,6 @@ function SideBarInfo() {
             <div className='SideBarInfo h-full px-4 bg-comp-1 flex flex-col justify-between w-full'>
                 <ul className="overflow-y-auto h-[98%]">
                     <li id="RewardContainer" className="border-b-2 border-[var(--primary-color)] py-3 flex">
-                        <div className="text-background flex self-center"><WorkspacePremiumIcon style={{ fontSize: "50px" }} /></div>
-                        <div className='GroupInformation'>
-                            <h1 id="RewardName" className="text-2xl text-color font-bold flex">ENTREGA 10 TAREAS</h1>
-                            <p id="Reward" className="text-sm text-color font-semibold">8/10 - 100 CalCoins</p>
-                        </div>
                     </li>
                 </ul>
             </div>
@@ -288,22 +302,21 @@ function SideBarInfo() {
         return (
             <div className='SideBarInfo h-full px-4 bg-comp-1 flex flex-col justify-between w-full'>
                 <ul className="overflow-y-auto h-[97%]">
-                    {assignments && assignments.map(assignment => {
-                        return (
-                            <li key={assignment.iD_Tareas} id={assignment.iD_Tareas} onClick={handleAssignmentClick} className="border-b-2 border-[var(--primary-color)] py-4 flex">
-                                <div className='text-background'><AssignmentIcon style={{ fontSize: "50px" }} /></div>
-                                <div className='text-color'>
-                                    <h1 id="TaskName" className="text-2xl font-bold">{assignment.nombre}</h1>
-                                    <p id="DateDue" className="text-sm font-semibold">Vencimiento: {new Date(assignment.fechaFinalizacion).toLocaleDateString("en-GB", {
+                    {assignments && assignments.map(assignment => (
+                        <li key={assignment.iD_Tareas} id={assignment.iD_Tareas} onClick={handleAssignmentClick} className="border-b-2 border-[var(--primary-color)] py-4 flex">
+                            <div className='text-background'><AssignmentIcon style={{ fontSize: "50px" }} /></div>
+                            <div className='text-color'>
+                                <h1 id="TaskName" className="text-2xl font-bold">{assignment.nombre}</h1>
+                                <p id="DateDue" className="text-sm font-semibold">
+                                    Vencimiento: {new Date(assignment.fechaFinalizacion).toLocaleDateString("en-GB", {
                                         day: "2-digit",
                                         month: "2-digit",
                                         year: "numeric"
-                                    })
-                                    }</p>
-                                </div>
-                            </li>
-                        )
-                    })}
+                                    })}
+                                </p>
+                            </div>
+                        </li>
+                    ))}
                 </ul>
                 <div id="AssignmentSwitch" className="flex h-[3%] justify-evenly space-x-2 my-4">
                     <button className="bg-primary w-full rounded-md font-bold text-xs"><Link to="/Assignments">Assignments</Link></button>
@@ -350,11 +363,11 @@ function SideBarInfo() {
                     </div>
                     <div className="inputbox space-y-4">
                         <p className="text-primary font-bold">Contraseña</p>
-                        <input className='inputLine w-full bg-transparent outline-none text-white border-b-2 border-[var(--primary-color)]' name="Contraseña" type="password" />
+                        <input value={newPassword} onChange={(e) => { setNewPassword(e.target.value) }} className='inputLine w-full bg-transparent outline-none text-white border-b-2 border-[var(--primary-color)]' name="Contraseña" type="password" />
                     </div>
                     <div className="inputbox space-y-4">
                         <p className="text-primary font-bold">Confirmar Contraseña</p>
-                        <input className='inputLine w-full bg-transparent outline-none text-white border-b-2 border-[var(--primary-color)]' name="Contraseña" type="password" />
+                        <input value={confirmNewPassword} onChange={(e) => { setConfirmNewPassword(e.target.value) }} className='inputLine w-full bg-transparent outline-none text-white border-b-2 border-[var(--primary-color)]' name="Contraseña" type="password" />
                     </div>
                     <div className="inputbox w-full flex items-center space-x-2 justify-center">
                         <label htmlFor="Encrypt" className="text-color cursor-pointer">
