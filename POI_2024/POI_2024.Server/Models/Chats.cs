@@ -4,11 +4,18 @@
     {
         public int ID_Chat { get; set; }
         public string Nombre { get; set; }
-     
+
         public int UsuarioAdmin { get; set; }
-        public int ID_ArchivoFoto  { get; set; }
+        public int ID_ArchivoFoto { get; set; }
 
     }
+
+    public class ChatsWithImage
+        {
+        public int ID_Chat { get; set; }
+        public string Nombre { get; set; }
+        public Byte[] Foto { get; set; }
+        }
 
     public class ChatFoundInfo
     {
