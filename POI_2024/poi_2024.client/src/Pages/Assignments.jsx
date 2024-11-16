@@ -17,11 +17,11 @@ function Assignments() {
     const [files, setFiles] = useState([]);
     const fileInputRef = useRef();
     const [idTareaSelected, setIdTareaSelected] = useState(null);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     useEffect(() => {
         setIdTareaSelected(idTarea);
     },[idTarea])
 
-    const user = JSON.parse(localStorage.getItem("user"));
 
     useEffect(() => {
         if (!idTarea) return;
@@ -47,7 +47,11 @@ function Assignments() {
                         break;
                     case 2: setStatus("Entregado");
                         break;
-                    case 3: setStatus("Revisado");
+                    case 3: setStatus("Aceptado");
+                        break;
+                    case 4: setStatus("Rechazado");
+                        break;
+                    case 5: setStatus("Reclamado");
                         break;
                     default: setStatus("Status no definido");
                         break;
@@ -100,6 +104,7 @@ function Assignments() {
                 }
                 registerFileAssignment();
                 setAddFilesAssignmentAtt(false);
+                location.reload();
             }
     }, [addFilesAssignmentAtt]);
 
@@ -156,7 +161,6 @@ function Assignments() {
             nombreCompleto: null,
             matricula: user.Matricula,
             contrasena: null,
-            iD_ArchivoFoto: 0, 
             calCoins: assignments.calCoins
 
         };
@@ -175,14 +179,43 @@ function Assignments() {
                     throw new Error("Error actualizando calCoins");
                 }
                 console.log("CalCoins Agregadas:", data);
+                user.calCoins += assignments.calCoins;
+                localStorage.setItem("user", JSON.stringify(user));
+                alert("Reclamaste tus Calcoins!");
+                location.reload();
             }
             catch (error) {
                 console.error("Hubo un error gg", error);
+            }
+
+            try {
+                const response = await fetch("UsersTareas", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        IDTarea: Number(idTareaSelected),
+                        Matricula: user.Matricula,
+                        Accepted: 5
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error("Error actualizando tarea:", response.statusText);
+                    return;
+                }
+
+                const result = await response.text();
+                console.log("Actualizacion correcta: ", result);
+            } catch (error) {
+                console.error("Error actualizando tareaaa: ", error);
             }
         }
         AddReward();
         setRewardAtt(false);
     }, [rewardAtt]);
+
     const handleFileChange = (event) => {
         const newFiles = Array.from(event.target.files);
         setFiles(prevFiles => [...prevFiles, ...newFiles]);
@@ -231,15 +264,17 @@ function Assignments() {
                 </div>
                 <div className="flex justify-between">
                     <div className="flex">
-                        {files.length !== 0 && (status !== "Entregado" && status !== "Revisado") && (
-                            <button className="bg-primary p-1 rounded-xl" onClick={SendAssignment}>
-                                Entregar
-                            </button>
-                        )}
+                        {
+                            (files.length !== 0 && status === "No entregado") && (
+                                <button className="bg-primary p-1 rounded-xl" onClick={SendAssignment}>
+                                    Entregar
+                                </button>
+                            )
+                        }
                         <h4 className="text-primary p-2 rounded-xl bg-comp-1">Status: {status}</h4>
                     </div>
                     <div id="Status" className="flex font-bold text-lg">
-                    {status !== "No Entregado" && (
+                    {status === "Aceptado" && (
                             <button className="text-color" onClick={handleRewardClick}>
                         Reclamar CalCoins.
                         </button>

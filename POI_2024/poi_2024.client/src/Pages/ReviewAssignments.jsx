@@ -26,11 +26,14 @@ function ReviewAssignments() {
     const { idTarea, setIdTarea } = useAssignment();
     const [ModalOpen, setModalOpen] = useState(false);
     const [tareaFound, setTareaFound] = useState(false);
-    const [tareaAccepted, setTareaAccepted] = useState(false);
+    const [tareaAccepted, setTareaAccepted] = useState(null);
     const [userAssignment, setUserAssignment] = useState(false);
     const [idTareaSelected, setIdTareaSelected] = useState(null);
     const [filesOfUser, setFilesOfUser] = useState(null);
     const [updateAtt, setUpdateAtt] = useState(false);
+    const [downloadAttempt, setDownloadAttempt] = useState(false);
+    const [idFiletoDownload, setIdFiletoDownload] = useState(false);
+
 
     useEffect(() => {
         if (!updateAtt) return;
@@ -63,6 +66,7 @@ function ReviewAssignments() {
 
         UpdateTarea();
         setUpdateAtt(false);
+        location.reload();
     }, [updateAtt]);
 
 
@@ -93,6 +97,35 @@ function ReviewAssignments() {
     }, [ModalOpen, userAssignment])
 
     useEffect(() => {
+        if (!downloadAttempt) return;
+        console.log(idFiletoDownload);
+
+        fetch("Archivos/" + idFiletoDownload).
+            then(response => response.json()).
+            then(data => {
+                const byteCharacters = atob(data.contenido);
+                const byteNumbers = new Uint8Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const DatatoDownload = new Blob([byteNumbers], { type: data.MIMEType });
+                const url = URL.createObjectURL(DatatoDownload);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute('download', data.nombre);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }).
+            catch(error => console.log("Hubo un error", error));
+
+        setDownloadAttempt(false);
+    }, [downloadAttempt]);
+
+
+    useEffect(() => {
         if (!ModalOpen) return;
         setFilesOfUser([]);
 
@@ -111,6 +144,11 @@ function ReviewAssignments() {
         setTareaAccepted(Accepted);
         setUpdateAtt(true);
     };
+
+    const DownloadFile = (e) => {
+        setIdFiletoDownload(Number(e.currentTarget.id));
+        setDownloadAttempt(true);
+    };
     return (
         <div id="Review-Container" className="w-3/4 h-full justify-center items-center flex">
             <div id="Assignments-Container" className="flex bg-comp-1 w-5/6 h-5/6 p-4 rounded-xl">
@@ -125,7 +163,8 @@ function ReviewAssignments() {
                                 <h2 className="flex items-center font-bold text-primary text-2xl">{
                                     assignmentFound.status === 1 ? "No Entregado" :
                                         assignmentFound.status === 2 ? "Entregado" :
-                                            assignmentFound.status === 3 ? "Revisado" : "Desconocido"
+                                            assignmentFound.status === 3 ? "Aceptado" :
+                                            assignmentFound.status === 5 ? "Reclamado" : "Rechazado"
                                 }</h2>
                             </li>
                         )
@@ -145,7 +184,7 @@ function ReviewAssignments() {
                                             <InsertDriveFileIcon />
                                                 <p>{fileOfUser.nombre}</p>
                                             </div>
-                                            <button><DownloadIcon /></button>
+                                            <button id={fileOfUser.iD_Archivo} onClick={DownloadFile}><DownloadIcon /></button>
                                         </li>
                                     );
                                 })}
@@ -153,8 +192,8 @@ function ReviewAssignments() {
                         </div>
 
                         <div className ="flex justify-evenly text-color font-semibold mt-4">
-                            <button onClick={() => { handleClickReview(true) }}>Aceptar</button>
-                            <button onClick={() => { handleClickReview(false) }}>Rechazar</button>
+                            <button onClick={() => { handleClickReview(3) }}>Aceptar</button>
+                            <button onClick={() => { handleClickReview(4) }}>Rechazar</button>
                         </div>
                     </div>
                 </Modal>
