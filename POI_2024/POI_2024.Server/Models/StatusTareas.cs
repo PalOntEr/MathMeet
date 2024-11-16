@@ -13,6 +13,6 @@
     {
         public int IDTarea { get; set; }
         public int Matricula { get; set; }
-        public bool Accepted { get; set; }
+        public int Accepted { get; set; }
     }
 }
