@@ -1,6 +1,6 @@
 import SideBar from '../Components/SideBar.jsx'
 import './Chat.css'
-import { useContext,useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { ChatContext } from '../ChatContext';
 import { UserContext } from '../UserContext';
 import * as signalR from '@microsoft/signalr';
@@ -17,7 +17,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import DownloadIcon from '@mui/icons-material/Download';
 
 
-import { Link,useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 const Modal = ({ show, handleClose, children }) => {
     if (!show) return null;
 
@@ -34,6 +34,8 @@ const Modal = ({ show, handleClose, children }) => {
 }
 const Chats = () => {
     const navigate = useNavigate();
+    const inputPhotoRef = useRef();
+    const [newPhotoOfChat, setNewPhotoOfChat] = useState(null);
     const { ChatID } = useContext(ChatContext);
     const [ChatInfo, setChatInfo] = useState([]);
     const [assignments, setAssignments] = useState(null);
@@ -43,21 +45,23 @@ const Chats = () => {
     const [memberstoAdd, setMemberstoAdd] = useState([]);
     const [membersConnectedOfChat, setMembersConnectedOfChat] = useState(null);
     const [membersConnectedInPage, setMembersConnectedInPage] = useState([]);
-    const [ChatName, setChatName] = useState();
     const [archives, setArchives] = useState(null);
     const [downloadAttempt, setDownloadAttempt] = useState(false);
     const [idFiletoDownload, setIdFiletoDownload] = useState(false);
     const [userAdmin, setUserAdmin] = useState(false);
     const [ModalOpen, setModalOpen] = useState(false);
     const [ModalAssignmentOpen, setModalAssignmentOpen] = useState(false);
-    const { user } = useContext(UserContext);
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
     const [addMembersAtt, setAddMembersAtt] = useState(false);
+    const [idArchive, setIdArchive] = useState(false);
     const [assignmentCreationAtt, setAssignmentCreationAtt] = useState(false);
     const [assignmentName, setAssignmentName] = useState(null);
     const [assignmentDescription, setAssignmentDescription] = useState(null);
     const [assignmentDue, setAssignmentDue] = useState(null);
     const [assignmentReward, setAssignmentReward] = useState(null);
     const [connection, setConnection] = useState(null);
+
+    const ChatPhoto = useRef();
     const openModal = () => setModalOpen(true);
     const closeModal = () => {
         setModalOpen(false);
@@ -79,7 +83,7 @@ const Chats = () => {
     }
 
     useEffect(() => {
-        if ((ChatID == null || ChatID  == 0) && connection) {
+        if ((ChatID == null || ChatID == 0) && connection) {
             connection.invoke("LeavePage", user.Matricula);
         }
     }, [ChatID]);
@@ -124,7 +128,7 @@ const Chats = () => {
         fetch('Mensajes?ID_Chat=' + ChatID).
             then(response => response.json()).
             then(data => {
-                const RestructuredArchive = data.filter(item => item.archivo !== null).filter(item => item.archivo.iD_Archivo >= 5)
+                const RestructuredArchive = data.filter(item => item.archivo !== null).filter(item => item.archivo.iD_Archivo > 5)
                     .map(item => ({
                         Archive: item.archivo
                     }));
@@ -237,12 +241,14 @@ const Chats = () => {
                 else {
                     setUserAdmin(false);
                 }
+                fetch("Archivos/" + data.chatInfo.iD_ArchivoFoto)
+                    .then(response => response.json())
+                    .then(data => ChatPhoto.current.src = "data:image/*;base64," + data.contenido)
+                    .catch(error => console.error(error));
             }).catch(error => { console.log(error) });
     }, [ChatID]);
 
     useEffect(() => {
-        // Logic to update UI based on membersConnectedOfChat changes
-        // This could include updating state or performing a render action
         console.log("Members connected changed:", membersConnectedOfChat);
     }, [membersConnectedOfChat]);
 
@@ -259,7 +265,7 @@ const Chats = () => {
             .then(async () => {
                 console.log("Connected to Global SignalR hub");
                 setConnection(connection);
-              await connection.invoke("JoinPage", user.Matricula);
+                await connection.invoke("JoinPage", user.Matricula);
             })
             .catch(err => console.error("SignalR connection error: ", err));
 
@@ -288,7 +294,15 @@ const Chats = () => {
             then(response => response.json()).
             then(data => {
                 console.log(data);
-                setAssignments(data);
+                const filteredAssignments = data.filter(assignment => {
+                    const assignmentDate = new Date(assignment.fechaFinalizacion);
+                    const today = new Date();
+
+                    // Strip the time from both dates for comparison
+                    return assignmentDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0);
+                });
+
+                setAssignments(filteredAssignments);
             }).catch(error => { console.error(error) });
     }, [ChatID]);
 
@@ -333,6 +347,81 @@ const Chats = () => {
         }
     }
 
+    const ChangeChatPhoto = () => {
+        inputPhotoRef.current.click();
+
+    }
+
+    const PhotoChanged = (event) => {
+        setNewPhotoOfChat(event.target.files[0]);
+    }
+
+    useEffect(() => {
+        if (!newPhotoOfChat) return;
+
+        const UpdatePhotoOfChat = async () => {
+            const fileReader = new FileReader();
+
+            // Read file as an ArrayBuffer
+            fileReader.readAsArrayBuffer(newPhotoOfChat);
+            fileReader.onload = async () => {
+                try {
+                    // Convert ArrayBuffer to base64 string
+                    const arrayBuffer = fileReader.result;
+                    const base64stringFile = btoa(
+                        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+                    );
+
+                    // Create the FileToUpload object
+                    const FileToUpload = {
+                        Nombre: newPhotoOfChat.name,
+                        MIMEType: newPhotoOfChat.type,
+                        tamano: newPhotoOfChat.size,
+                        Contenido: base64stringFile,
+                    };
+
+                    // Make the POST request to register the file
+                    const fileResponse = await fetch("Archivos", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(FileToUpload),
+                    });
+
+                    if (!fileResponse.ok) {
+                        throw new Error("Error en la solicitud de registro de archivo");
+                    }
+
+                    const fileData = await fileResponse.json();
+                    const idArchivo = fileData.iD_Archivo;
+                    setIdArchive(idArchivo);
+
+                    console.log("Archivo registrado con éxito: ", fileData);
+
+                    // Make the PUT request to update the chat with the new file ID
+                    const chatResponse = await fetch("Chat/" + ChatID, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: idArchivo,
+                    });
+
+                    if (!chatResponse.ok) {
+                        throw new Error("Error al actualizar el chat");
+                    }
+
+                    ChatPhoto.current.src = "data:image/*;base64," + base64stringFile;
+                    console.log("Chat actualizado con éxito");
+                } catch (error) {
+                    console.error("Hubo un error: ", error);
+                }
+            };
+        };
+
+        UpdatePhotoOfChat();
+        }, [newPhotoOfChat]);
     return (
         <div id="content-container" className="flex h-screen w-2/3 xs:w-3/4">
             <div id="chat-container" className="flex flex-col justify-between h-full w-3/4 px-2">
@@ -347,8 +436,8 @@ const Chats = () => {
 
             <div className="chatinfo-container container w-1/4 h-full bg-comp-1 px-4">
                 <div className="groupinfo items-center flex flex-col">
-
-                    <img src={GroupImg} className="rounded-full w-3/4 h-3/4 xs:w-5/6 xs:h-5/6 my-4" />
+                    <input type="file" hidden ref={inputPhotoRef} onChange={PhotoChanged}></input>
+                    <img ref={ChatPhoto} onClick={ChangeChatPhoto} className="rounded-full w-3/4 h-3/4 xs:w-5/6 xs:h-5/6 my-4" />
                     <p id="groupname" className="text-primary font-bold text-mdxs:text-xl"> {ChatInfo.nombre}</p>
                 </div>
 
