@@ -97,14 +97,7 @@ namespace POI_2024.Server.Controllers
                 return NotFound();
             }
 
-            if (request.Accepted)
-            {
-                TareaToUpdate.Status = 3;
-            }
-            else
-            {
-                TareaToUpdate.Status = 4;
-            }
+            TareaToUpdate.Status = request.Accepted;
             await _context.SaveChangesAsync();
 
             return Ok("Tarea Updated"); 
