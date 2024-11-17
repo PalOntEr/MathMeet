@@ -15,7 +15,7 @@ const Modal = ({ show, handleClose, children }) => {
     if (!show) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="absolute z-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-comp-1 w-1/2 p-6 space-y-4 rounded-lg shadow-lg">
                 <button onClick={handleClose} className="mb-4 text-red-500">
                     Close
@@ -234,19 +234,6 @@ function SideBarInfo() {
     if (pagina.pathname == '/Chats')
         return (
             <div className='SideBarInfo px-4 bg-comp-1 flex flex-col justify-between w-full'>
-                <ul className="overflow-y-auto flex flex-col min-h-[96]">
-                    {ChatsFound.map(ChatFound => (
-                        <li key={ChatFound.iD_Chat} onClick={() => { ChatSelected(ChatFound.iD_Chat) }} value={ChatFound.iD_Chat} className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
-                            <div id={ChatFound.iD_Chat == ChatID ? "activeChat" : ""} className="flex flex-row w-full text-color px-2 py-3">
-                                    <img src={"data:image/*;base64," + ChatFound.foto} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
-                                <div className="w-full justify-center flex flex-col">
-                                    <h1 id="GroupName" className="text-xl xs:text-3xl font-bold flex justify-between">{ChatFound.nombre}</h1>
-                                </div>
-                            </div>
-                        </li>
-                        ))}
-                </ul>
-                <button onClick={openModal} id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
                 <Modal show={ModalOpen} handleClose={closeModal}>
                     <h1 className="text-center font-bold text-4xl text-color">Crear <span className="text-secondary">Chat</span></h1>
                     <form className="flex flex-col space-y-4">
@@ -285,6 +272,19 @@ function SideBarInfo() {
                         <button id="CreateChat" onClick={handleClickChat} type="submit" className="w-1/2 self-center py-1 font-semibold rounded-md text-color">Crear</button>
                     </form>
                 </Modal>
+                <ul className="overflow-y-auto flex flex-col min-h-[96]">
+                    {ChatsFound.map(ChatFound => (
+                        <li key={ChatFound.iD_Chat} onClick={() => { ChatSelected(ChatFound.iD_Chat) }} value={ChatFound.iD_Chat} className="cursor-pointer border-b-2 border-[var(--primary-color)] py-3 w-full justify-between flex flex-row">
+                            <div id={ChatFound.iD_Chat == ChatID ? "activeChat" : ""} className="flex flex-row w-full text-color px-2 py-3">
+                                    <img src={"data:image/*;base64," + ChatFound.foto} className="w-1/6 xs:w-1/5 ImgGroup rounded-full mx-2" />
+                                <div className="w-full justify-center flex flex-col">
+                                    <h1 id="GroupName" className="text-xl xs:text-3xl font-bold flex justify-between">{ChatFound.nombre}</h1>
+                                </div>
+                            </div>
+                        </li>
+                        ))}
+                </ul>
+                <button onClick={   openModal} id="AddChat" className="w-full rounded-xl font-bold py-1"><AddIcon /> Nuevo Chat </button>
             </div>
 
         );

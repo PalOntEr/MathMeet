@@ -60,7 +60,7 @@ const IncomingMessage = ({ Emote, message, sender, DateSent, Archive, userFoto, 
         );
 
     return location ? (
-            <div className="incoming-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 m-3 space-y-2">
+            <div className="z-0 incoming-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 m-3 space-y-2">
                 <div className="flex items-center">
                     <img className="h-10 rounded-full" src={"data:image/*;base64," + userFoto.contenido} />
                 <div className="incoming-message-sender text-color opacity-60 text-xs">{sender}</div>

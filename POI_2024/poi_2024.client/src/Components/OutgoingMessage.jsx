@@ -51,7 +51,7 @@ const OutgoingMessage = ({ message, sender, DateSent, Archive, userFoto, locatio
 
     if (Archive && Archive.iD_Archivo <= 5)
         return (
-            <div className="outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3">
+            <div className=" outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3">
                 <div className="flex items-center">
                     <img className="h-10 rounded-full" src={"data:image/*;base64," + userFoto.contenido} />
                     <div className="outgoing-message-sender text-color opacity-60 text-xs">{sender}</div>
@@ -63,7 +63,7 @@ const OutgoingMessage = ({ message, sender, DateSent, Archive, userFoto, locatio
 
 
     return location ? (
-            <div className="outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3 space-y-2">
+        <div className=" outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3 space-y-2">
                 <div className="flex items-center">
                     <img className="h-10 rounded-full" src={"data:image/*;base64," + userFoto.contenido} />
                     <div className="outgoing-message-sender text-color opacity-60 text-xs">{sender}</div>
@@ -73,7 +73,7 @@ const OutgoingMessage = ({ message, sender, DateSent, Archive, userFoto, locatio
             </div>
         ) :
         (
-            <div className="outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3 space-y-2">
+            <div className=" outgoing-message-container bg-comp-1 rounded-md w-1/3 px-3 py-2 self-end m-3 space-y-2">
                 <div className="flex items-center">
                     <img className="h-10 rounded-full" src={"data:image/*;base64," + userFoto.contenido} />
                     <div className="outgoing-message-sender text-color opacity-60 text-xs">{sender}</div>
