@@ -43,6 +43,12 @@ public class VideoChatHub : Hub
         await Clients.GroupExcept(ChatID,targetConnectionId).SendAsync("incomingCall", Context.ConnectionId);
     }
 
+    public async Task CallEnded(string ChatID, string targetConnectionId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, ChatID);
+        await Clients.GroupExcept(ChatID, targetConnectionId).SendAsync("CallEnd",Context.ConnectionId);
+    }
+
     public async Task SendOffer(string offer, string targetConnectionId,string ChatID)
     {
         _logger.LogInformation("Sending offer to a specific client.");
