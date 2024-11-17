@@ -121,6 +121,7 @@ function SideBarInfo() {
                 setUsuarioBuscado("");
                 setUsuariosSelec([]);
                 closeModal();
+                    alert("Chat creado con exito");
             } catch (error) {
                 console.error('Error al registrar el usuario:', error);
                 //alert("Hubo un error al registrar el usuario");
@@ -151,7 +152,7 @@ function SideBarInfo() {
             catch(error => {
                 console.error(error);
             });
-    }, [ChatID]);
+    }, [ChatID, ChatRegisterAtt]);
 
     useEffect(() => {
         if (!updateUserAtt) return;
@@ -286,16 +287,6 @@ function SideBarInfo() {
                 </Modal>
             </div>
 
-        );
-
-    if (pagina.pathname === '/Shop')
-        return (
-            <div className='SideBarInfo h-full px-4 bg-comp-1 flex flex-col justify-between w-full'>
-                <ul className="overflow-y-auto h-[98%]">
-                    <li id="RewardContainer" className="border-b-2 border-[var(--primary-color)] py-3 flex">
-                    </li>
-                </ul>
-            </div>
         );
 
     if (pagina.pathname === '/Assignments')

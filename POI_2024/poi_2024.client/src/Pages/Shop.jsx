@@ -64,7 +64,7 @@ function Shop() {
         }
     };
     return (
-        <div className="container px-4 w-3/4 xs:w-2/3 flex flex-col justify-between">
+        <div className="container px-4 w-full flex flex-col justify-between">
             <h1 className="text-7xl font-bold text-primary text-center">MEET <span className="text-secondary">SHOP</span></h1>
             <div id="EmojisContainer" className="w-full">
                 <h2 className="text-2xl font-semibold text-primary">EMOJIS</h2>
@@ -89,17 +89,33 @@ function Shop() {
                     })}
                 </div>
             </div>
-            <div className="flex space-x-4 w-full">
-                <div id="AvatarContainer" className="flex flex-col">
-                    <h2 className="text-2xl font-semibold text-primary mt-4">AVATAR OF THE DAY</h2>
-                    <div className="h-1 bg-comp-1 my-1 w-full"></div>
-                    <div className="bg-comp-1 rounded-xl p-6 w-full h-auto flex justify-center">
-                        <div className='flex flex-col Emoji text-color w-1/2 h-auto items-center'>
-                            <img className="w-1/3"/>
-                            <h3 className="text-center font-bold text-xl">150 CalCoins</h3>
+            <div className="flex space-x-4">
+                <div id="TitlesContainer" className="w-full flex flex-col justify-between">
+                    <div>
+                        <h2 className="text-2xl font-semibold text-primary mt-4">TITLES - Proximamente...</h2>
+                        <div className="h-1 bg-comp-1 my-1"></div>
+                        <div className="bg-comp-1 space-y-2 rounded-xl">
+                            <div className="w-full p-4">
+                                <div className="flex justify-between">
+                                    <h4 className="text-secondary font-bold text-2xl">LA CABRA - 50 CalCoins</h4>
+                                    <button className="bg-primary p-1 rounded-lg text-sm font-semibold">Comprar</button>
+                                </div>
+                            </div>
+                            <div className="w-full p-4">
+                                <div className="flex justify-between">
+                                    <h4 className="text-secondary font-bold text-2xl">Calc's No. 1 - 50 CalCoins</h4>
+                                    <button className="bg-primary p-1 rounded-lg text-sm font-semibold">Comprar</button>
+                                </div>
+                            </div>
+                            <div className="w-full p-4">
+                                <div className="flex justify-between">
+                                    <h4 className="text-secondary font-bold text-2xl">Pro Matlete - 50 CalCoins</h4>
+                                    <button className="bg-primary p-1 rounded-lg text-sm font-semibold">Comprar</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <p className="text-secondary text-2xl font-semibold">CalCoins: { user.calCoins}</p>
+                    <p className="text-secondary text-2xl font-semibold">CalCoins: 1500</p>
                 </div>
             </div>
         </div>

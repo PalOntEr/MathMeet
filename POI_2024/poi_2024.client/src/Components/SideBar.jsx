@@ -14,13 +14,14 @@ function SideBar() {
     const locationpaths = "/ModifyUser";
     const navigate = useNavigate();
     const locationpaths2 = "/videochat";
+    const locationpaths3 = "/Shop";
     const [logOutAtt, setLogOutAtt] = useState(false);
 
     var SideBarWidth;
     var SideBar2Width;
     var SideBarColor;
 
-    if (location.pathname === locationpaths2) {
+    if (location.pathname === locationpaths2 || location.pathname === "/Shop") {
         SideBarWidth = '';
         SideBar2Width = 'w-full';
         SideBarColor = 'bg-comp-1';
