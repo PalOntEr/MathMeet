@@ -18,6 +18,7 @@ function Assignments() {
     const fileInputRef = useRef();
     const [idTareaSelected, setIdTareaSelected] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
     useEffect(() => {
         setIdTareaSelected(idTarea);
     },[idTarea])
@@ -57,7 +58,7 @@ function Assignments() {
                         break;
                 }
             }).catch(error => console.error("Hubo un error gg", error));
-    }, [idTareaSelected, addFilesAssignmentAtt]);
+    }, [idTareaSelected]);
 
     useEffect(() => {
 

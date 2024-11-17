@@ -304,7 +304,7 @@ const Chats = () => {
 
                 setAssignments(filteredAssignments);
             }).catch(error => { console.error(error) });
-    }, [ChatID]);
+    }, [ChatID, setAssignmentCreationAtt]);
 
     useEffect(() => {
         fetch('usuarios?name=' + memberBuscado)

@@ -34,7 +34,6 @@ function ReviewAssignments() {
     const [downloadAttempt, setDownloadAttempt] = useState(false);
     const [idFiletoDownload, setIdFiletoDownload] = useState(false);
 
-
     useEffect(() => {
         if (!updateAtt) return;
 
