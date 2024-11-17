@@ -64,7 +64,7 @@ function Shop() {
         }
     };
     return (
-        <div className="container px-4 w-full flex flex-col justify-between">
+        <div className="container px-4 w-full flex flex-col justify-between ml-14">
             <h1 className="text-7xl font-bold text-primary text-center">MEET <span className="text-secondary">SHOP</span></h1>
             <div id="EmojisContainer" className="w-full">
                 <h2 className="text-2xl font-semibold text-primary">EMOJIS</h2>
@@ -115,7 +115,7 @@ function Shop() {
                             </div>
                         </div>
                     </div>
-                    <p className="text-secondary text-2xl font-semibold">CalCoins: 1500</p>
+                    <p className="text-secondary text-2xl font-semibold">CalCoins: {user.calCoins }</p>
                 </div>
             </div>
         </div>
