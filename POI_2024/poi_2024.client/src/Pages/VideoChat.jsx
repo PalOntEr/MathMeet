@@ -48,7 +48,17 @@ const VideoChat = () => {
             });
 
             newConnection.on("UserLeft", (_callerConnectionID) => {
-                console.log("Este tilino se fue", _callerConnectionID);
+                if (_callerConnectionID !== localConnectionIdRef.current) {
+                    console.log("Este tilino se fue", _callerConnectionID);
+                    if (localVideoRef.current && localVideoRef.current.srcObject) {
+                        localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+                    }
+
+                    if (remoteVideoRef.current && remoteVideoRef.current.srcObject) {
+                        remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+                    }
+                    EndCall();
+                }
             });
 
             await newConnection.start();
@@ -126,6 +136,20 @@ const VideoChat = () => {
                     }
                 }
             };
+            pc.onconnectionstatechange = () => {
+                switch (pc.connectionState) {
+                    case "disconnected":
+                    case "failed":
+
+                        break;
+                    case "closed":
+                        notifyCallEnded();
+                        break;
+                    default:
+                        // Other states: "new", "connecting", "connected"
+                        break;
+                }
+            };
 
             peerConnectionRef.current = pc;
             console.log("PeerConnection initialized", pc);
@@ -134,6 +158,9 @@ const VideoChat = () => {
         }
     };
 
+    const notifyCallEnded = () => {
+        connectionRef.current.invoke("CallEnded", ChatID, localConnectionIdRef.current);
+    }
     const handleReceiveOffer = async (offer, senderConnectionId) => {
         if (senderConnectionId === localConnectionIdRef.current) return;
 
@@ -265,15 +292,14 @@ const VideoChat = () => {
         }
 
         if (connectionRef.current) {
+            connectionRef.current.invoke("LeaveGroup", ChatID.toString());
+            window.location.href = "/#/Chats";
             connectionRef.current.stop().then(() => {
-                console.log("Disconnected from videochat");
-                connectionRef.current = null;
+            console.log("Disconnected from videochat");
+            connectionRef.current = null;
             });
         }
 
-        connectionRef.current.invoke("LeaveGroup", ChatID.toString());
-
-        navigate("/Chats");
     }
 
     const handleAcceptCall = async () => {
