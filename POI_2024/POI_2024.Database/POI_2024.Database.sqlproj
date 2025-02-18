@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build">
+  <Sdk Name="Microsoft.Build.Sql" Version="0.1.12-preview" />
+  <PropertyGroup>
+    <Name>POI_2024.Database</Name>
+    <ProjectGuid>{fc4f0101-9542-4c14-bd1f-71d1e882c085}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <GenerateCreateScript>True</GenerateCreateScript>
+    <IncludeSchemaNameInFileName>False</IncludeSchemaNameInFileName>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Tables" />
+    <Folder Include="Database" />
+    <Folder Include="Programmability" />
+    <Folder Include="Programmability\Stored Procedures" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\PreDeploy" />
+    <Folder Include="Scripts\PostDeploy" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\Archivos.sql" />
+    <Build Include="Tables\ArchivosTareas.sql" />
+    <Build Include="Tables\Chats.sql" />
+    <Build Include="Tables\ChatsUsuarios.sql" />
+    <Build Include="Tables\Mensajes.sql" />
+    <Build Include="Tables\Premios.sql" />
+    <Build Include="Tables\Tareas.sql" />
+    <Build Include="Tables\Usuarios.sql" />
+    <Build Include="Tables\UsuariosPremios.sql" />
+    <None Include="Database\INITIALIZE DATABASE.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Usuario.sql" />
+    <PostDeploy Include="Scripts\PostDeploy\Script.DummyData.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Mensaje.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Archivos.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Premios.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Chats.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_Tareas.sql" />
+    <Build Include="Programmability\Stored Procedures\sp_ChatsUsuarios.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="POI_2024.Database.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="POI_2024.Database.refactorlog" />
+  </ItemGroup>
+  <Target Name="BeforeBuild">
+    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
+  </Target>
+</Project>

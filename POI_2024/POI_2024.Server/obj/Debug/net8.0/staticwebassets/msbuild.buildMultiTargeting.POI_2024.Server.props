@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\POI_2024.Server.props" />
+</Project>

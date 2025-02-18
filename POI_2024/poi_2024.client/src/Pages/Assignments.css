@@ -1,0 +1,13 @@
+#Icon-Button
+{
+    transform:scale(1);
+    transition:150ms;
+}
+
+#Icon-Button:hover
+{
+    transform:scale(1.25);
+    transition:150ms;
+    color: var(--comp-1-color);
+    background-color: var(--primary-color)
+}

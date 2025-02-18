@@ -1,0 +1,53 @@
+﻿** Aspectos destacados
+     Tablas que se volverán a crear con los datos migrados
+       Ninguno
+     Índices clúster que se van a quitar
+       Ninguno
+     Índices clúster que se van a crear
+       Ninguno
+     Posibles incidencias de datos
+       Ninguno
+
+** Acciones del usuario
+     Crear
+       [dbo].[Archivos] (Tabla)
+       [dbo].[ArchivosTareas] (Tabla)
+       [dbo].[Chats] (Tabla)
+       [dbo].[ChatsUsuarios] (Tabla)
+       [dbo].[Mensajes] (Tabla)
+       [dbo].[Premios] (Tabla)
+       [dbo].[StatusTareas] (Tabla)
+       [dbo].[Tareas] (Tabla)
+       [dbo].[Usuarios] (Tabla)
+       [dbo].[UsuariosPremios] (Tabla)
+       Restricción DEFAULT: restricción sin nombre en [dbo].[Archivos] (Restricción DEFAULT)
+       Restricción DEFAULT: restricción sin nombre en [dbo].[Mensajes] (Restricción DEFAULT)
+       Restricción DEFAULT: restricción sin nombre en [dbo].[Mensajes] (Restricción DEFAULT)
+       Restricción DEFAULT: restricción sin nombre en [dbo].[Tareas] (Restricción DEFAULT)
+       Restricción DEFAULT: restricción sin nombre en [dbo].[Usuarios] (Restricción DEFAULT)
+       Clave externa: restricción sin nombre en [dbo].[ArchivosTareas] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[ArchivosTareas] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[ArchivosTareas] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Chats] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Chats] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[ChatsUsuarios] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[ChatsUsuarios] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Mensajes] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Mensajes] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Mensajes] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Premios] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[StatusTareas] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[StatusTareas] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Tareas] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[Usuarios] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[UsuariosPremios] (Clave externa)
+       Clave externa: restricción sin nombre en [dbo].[UsuariosPremios] (Clave externa)
+       [dbo].[sp_Archivos] (Procedimiento)
+       [dbo].[sp_Chats] (Procedimiento)
+       [dbo].[sp_ChatsUsuarios] (Procedimiento)
+       [dbo].[sp_Mensaje] (Procedimiento)
+       [dbo].[sp_Premios] (Procedimiento)
+       [dbo].[sp_Tareas] (Procedimiento)
+       [dbo].[sp_Usuario] (Procedimiento)
+
+** Acciones de compatibilidad

@@ -1,0 +1,14 @@
+#AgregarIntegrante:hover,#AddChat:hover
+{
+    
+    color:var(--comp-1);
+    background-color: var(--primary-color);
+    transition: 150ms;
+}
+
+#AgregarIntegrante,#AddChat
+{
+    color:var(--primary-color);
+    background-color: var(--comp-1);
+    transition:150ms;
+}

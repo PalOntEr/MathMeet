@@ -1,0 +1,46 @@
+﻿** Highlights
+     Tables that will be recreated with data migrated
+       None
+     Clustered indexes that will be dropped
+       None
+     Clustered indexes that will be created
+       None
+     Possible data issues
+       None
+
+** User actions
+     Create
+       [dbo].[Archivos] (Table)
+       [dbo].[ArchivosTareas] (Table)
+       [dbo].[Chats] (Table)
+       [dbo].[ChatsUsuarios] (Table)
+       [dbo].[Mensajes] (Table)
+       [dbo].[Premios] (Table)
+       [dbo].[Tareas] (Table)
+       [dbo].[Usuarios] (Table)
+       [dbo].[UsuariosPremios] (Table)
+       Default Constraint: unnamed constraint on [dbo].[Archivos] (Default Constraint)
+       Default Constraint: unnamed constraint on [dbo].[Mensajes] (Default Constraint)
+       Default Constraint: unnamed constraint on [dbo].[Tareas] (Default Constraint)
+       Default Constraint: unnamed constraint on [dbo].[Usuarios] (Default Constraint)
+       Foreign Key: unnamed constraint on [dbo].[ArchivosTareas] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[ArchivosTareas] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[ArchivosTareas] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Chats] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Chats] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[ChatsUsuarios] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[ChatsUsuarios] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Mensajes] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Mensajes] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Mensajes] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Premios] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Tareas] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[Usuarios] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[UsuariosPremios] (Foreign Key)
+       Foreign Key: unnamed constraint on [dbo].[UsuariosPremios] (Foreign Key)
+       [dbo].[sp_Archivos] (Procedure)
+       [dbo].[sp_Chats] (Procedure)
+       [dbo].[sp_Premios] (Procedure)
+       [dbo].[sp_Usuario] (Procedure)
+
+** Supporting actions
