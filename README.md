@@ -17,8 +17,8 @@ This repository contains a video chat application called MathMeet, that uses Rea
 - User authentication
 - Chat history
 - Sending files
-- Encrypting chat=messages
-- 
+- Encrypting chat messages
+- Location sending through google maps API
 
 ## Prerequisites
 
